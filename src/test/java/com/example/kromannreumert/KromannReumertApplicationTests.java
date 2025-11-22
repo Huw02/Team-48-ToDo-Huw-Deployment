@@ -8,5 +8,4 @@ import org.springframework.context.ApplicationContext;
 @SpringBootTest
 class KromannReumertApplicationTests {
 
-
 }
