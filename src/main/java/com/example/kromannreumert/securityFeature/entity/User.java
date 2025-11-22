@@ -32,6 +32,7 @@ public class User {
     private String name;
 
     @Email
+    @NotNull
     private String email;
 
     @NotEmpty
@@ -40,6 +41,11 @@ public class User {
     @NotNull
     private Date createdDate;
 
-    @NotNull
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
     private Set<Role> roles;
 }

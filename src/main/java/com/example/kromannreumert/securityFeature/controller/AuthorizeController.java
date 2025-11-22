@@ -1,17 +1,14 @@
 package com.example.kromannreumert.securityFeature.controller;
 
-import com.example.kromannreumert.securityFeature.JwtUtil.JwtGenerator;
 import com.example.kromannreumert.securityFeature.dto.JwtResponseDTO;
 import com.example.kromannreumert.securityFeature.dto.LoginDTO;
-import com.example.kromannreumert.securityFeature.entity.Role;
 import com.example.kromannreumert.securityFeature.entity.User;
 import com.example.kromannreumert.securityFeature.service.LoginService;
 import com.example.kromannreumert.securityFeature.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +21,7 @@ import java.util.List;
 // ADD @EnableMethodSecurity
 public class AuthorizeController {
 
+    private static Logger log = LoggerFactory.getLogger(AuthorizeController.class);
     private final UserService userService;
     private final LoginService loginService;
 
@@ -35,9 +33,12 @@ public class AuthorizeController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDTO loginRequest) {
         try {
+            log.info("Login has been accesed with {}", loginRequest.username());
             JwtResponseDTO response = loginService.login(loginRequest);
+            log.info("Login was successful {}", response.username());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            log.error("It was not possible to sign the user in {}", loginRequest.username());
             return ResponseEntity.badRequest().body("Could not sign user in");
         }
     }

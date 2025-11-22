@@ -1,5 +1,6 @@
 package com.example.kromannreumert.securityFeature.service;
 
+import com.example.kromannreumert.securityFeature.entity.LogAction;
 import com.example.kromannreumert.securityFeature.entity.User;
 import com.example.kromannreumert.securityFeature.repository.UserRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,10 +17,12 @@ public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final LoggingService log;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, LoggingService log) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.log = log;
     }
 
     @Override
@@ -41,6 +44,11 @@ public class UserService implements UserDetailsService {
         try {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             userRepository.save(user);
+            log.log(
+                    LogAction.CREATE_USER,
+                    "TODO ADD AUTH USER",
+                    "Created new user: " + user.getName()
+                    );
             return "User created: " + user.getName();
         } catch (RuntimeException e) {
             throw new RuntimeException("Could not create user");
