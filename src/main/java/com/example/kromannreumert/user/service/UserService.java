@@ -1,9 +1,9 @@
-package com.example.kromannreumert.securityFeature.service;
+package com.example.kromannreumert.user.service;
 
-import com.example.kromannreumert.securityFeature.controller.AuthorizeController;
-import com.example.kromannreumert.securityFeature.entity.LogAction;
-import com.example.kromannreumert.securityFeature.entity.User;
-import com.example.kromannreumert.securityFeature.repository.UserRepository;
+import com.example.kromannreumert.logging.entity.LogAction;
+import com.example.kromannreumert.logging.service.LoggingService;
+import com.example.kromannreumert.user.entity.User;
+import com.example.kromannreumert.user.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

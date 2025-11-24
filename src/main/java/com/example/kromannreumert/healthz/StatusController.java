@@ -1,7 +1,6 @@
 package com.example.kromannreumert.healthz;
 
 
-import com.example.kromannreumert.securityFeature.controller.AuthorizeController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;

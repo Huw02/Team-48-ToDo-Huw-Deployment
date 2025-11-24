@@ -1,4 +1,4 @@
-package com.example.kromannreumert.securityFeature.entity;
+package com.example.kromannreumert.user.entity;
 
 
 import jakarta.persistence.*;

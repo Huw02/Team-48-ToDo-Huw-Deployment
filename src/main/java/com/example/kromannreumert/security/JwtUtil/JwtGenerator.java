@@ -1,11 +1,7 @@
-package com.example.kromannreumert.securityFeature.JwtUtil;
+package com.example.kromannreumert.security.JwtUtil;
 
-import com.example.kromannreumert.securityFeature.entity.Role;
-import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.KeyLengthException;
-import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;

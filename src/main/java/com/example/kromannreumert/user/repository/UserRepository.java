@@ -1,6 +1,6 @@
-package com.example.kromannreumert.securityFeature.repository;
+package com.example.kromannreumert.user.repository;
 
-import com.example.kromannreumert.securityFeature.entity.User;
+import com.example.kromannreumert.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

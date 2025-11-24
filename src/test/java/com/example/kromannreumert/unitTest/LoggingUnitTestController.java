@@ -1,8 +1,8 @@
 package com.example.kromannreumert.unitTest;
 
-import com.example.kromannreumert.securityFeature.config.SecurityConfig;
-import com.example.kromannreumert.securityFeature.controller.LogController;
-import com.example.kromannreumert.securityFeature.service.LoggingService;
+import com.example.kromannreumert.security.config.SecurityConfig;
+import com.example.kromannreumert.logging.controller.LogController;
+import com.example.kromannreumert.logging.service.LoggingService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

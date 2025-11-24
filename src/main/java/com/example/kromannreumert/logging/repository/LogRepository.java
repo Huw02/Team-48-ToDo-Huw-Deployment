@@ -1,7 +1,7 @@
-package com.example.kromannreumert.securityFeature.repository;
+package com.example.kromannreumert.logging.repository;
 
-import com.example.kromannreumert.securityFeature.entity.LogAction;
-import com.example.kromannreumert.securityFeature.entity.Logging;
+import com.example.kromannreumert.logging.entity.LogAction;
+import com.example.kromannreumert.logging.entity.Logging;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

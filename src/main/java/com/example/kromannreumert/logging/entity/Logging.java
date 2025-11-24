@@ -1,4 +1,4 @@
-package com.example.kromannreumert.securityFeature.entity;
+package com.example.kromannreumert.logging.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
