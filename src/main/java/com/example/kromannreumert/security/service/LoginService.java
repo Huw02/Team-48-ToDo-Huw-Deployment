@@ -34,7 +34,7 @@ public class LoginService {
     public JwtResponseDTO login(LoginDTO loginRequest) throws Exception {
         try {
 
-            log.info("A user is trying to login {}", loginRequest.username());
+            log.info("Service: A user is trying to login {}", loginRequest.username());
             // This is for spring security to handle username and password with bcrypt
             // as it does not retrieve roles from the DB, we have to do it manually
             authenticationManager.authenticate(
@@ -45,17 +45,17 @@ public class LoginService {
 
             // For us to retrieve the user roles, we have to retrieve the user object
             User user = userService.findUserByUsername(loginRequest.username());
-            log.info("Credentials verified {}", user.getName());
+            log.info("Service: Credentials verified {}", user.getName());
 
             // Get the roles, extract it to a String list so it can be forwarded with the request
             List<String> roles = user.getRoles().stream()
                     .map(role -> role.getRoleName().toUpperCase())
                     .toList();
-            log.info("Retrieved roles from the user");
+            log.info("Service: Retrieved roles from the user {}", roles);
 
             // Generate the JWT token
             String token = jwtIssuer.issueToken(user.getUsername(), roles);
-            log.info("Generating the token for the user {}", user.getUsername());
+            log.info("Service: Generating the token for the user {}", user.getUsername());
 
             // Return the JWT token
             loggingService.log(LogAction.LOGIN_SUCCESS, user.getUsername(), "User logged in");

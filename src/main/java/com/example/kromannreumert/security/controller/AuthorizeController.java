@@ -31,12 +31,12 @@ public class AuthorizeController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDTO loginRequest) {
         try {
-            log.info("Login has been accesed with {}", loginRequest.username());
+            log.info("Controller: Login has been accesed with {}", loginRequest.username());
             JwtResponseDTO response = loginService.login(loginRequest);
-            log.info("Login was successful {}", response.username());
+            log.info("Controller: Login was successful {}", response.username());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            log.error("It was not possible to sign the user in {}", loginRequest.username());
+            log.error("Controller: It was not possible to sign the user in {}", loginRequest.username());
             return ResponseEntity.badRequest().body("Could not sign user in");
         }
     }

@@ -57,7 +57,7 @@ public class UserService implements UserDetailsService {
             log.info("Successfully encrypted password {}", user.getName());
             userRepository.save(user);
             log.info("Successfully created {}", user.getName());
-            loggingService.log(LogAction.CREATE_USER,"TODO ADD AUTH USER","Created new user: " + user.getName());
+            loggingService.log(LogAction.CREATE_USER,"Zahaa","Created new user: " + user.getName());
 
             return "User created: " + user.getName();
 
@@ -71,7 +71,7 @@ public class UserService implements UserDetailsService {
     }
 
     public User findUserByUsername(String username) {
-        log.info("Trying to find user by username {}", username);
+        log.info("Service: Trying to find user by username {}", username);
         return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 }

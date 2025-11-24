@@ -27,7 +27,7 @@ public class LogController {
     // @PreAuthorize("hasRole('ADMIN')") <-- add preAuthorize when we are ready
     @GetMapping("/getalllogs")
     public List<Logging> getAllLogs(Principal principal) {
-        log.info("Get all logs has been accessed by {}", principal.getName());
+        log.info("Controller: Get all logs has been accessed by {}", principal.getName());
         return loggingService.getAllLogs();
     }
 }

@@ -24,6 +24,7 @@ public class LoggingService {
         logRepository.save(entry);
     }
 
+
     public List<Logging> getAllLogs() {
         return logRepository.findAll();
     }
