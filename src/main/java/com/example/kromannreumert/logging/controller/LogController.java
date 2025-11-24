@@ -1,7 +1,7 @@
-package com.example.kromannreumert.securityFeature.controller;
+package com.example.kromannreumert.logging.controller;
 
-import com.example.kromannreumert.securityFeature.entity.Logging;
-import com.example.kromannreumert.securityFeature.service.LoggingService;
+import com.example.kromannreumert.logging.entity.Logging;
+import com.example.kromannreumert.logging.service.LoggingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;

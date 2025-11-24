@@ -1,10 +1,10 @@
-package com.example.kromannreumert.securityFeature.controller;
+package com.example.kromannreumert.security.controller;
 
-import com.example.kromannreumert.securityFeature.dto.JwtResponseDTO;
-import com.example.kromannreumert.securityFeature.dto.LoginDTO;
-import com.example.kromannreumert.securityFeature.entity.User;
-import com.example.kromannreumert.securityFeature.service.LoginService;
-import com.example.kromannreumert.securityFeature.service.UserService;
+import com.example.kromannreumert.security.dto.JwtResponseDTO;
+import com.example.kromannreumert.security.dto.LoginDTO;
+import com.example.kromannreumert.user.entity.User;
+import com.example.kromannreumert.security.service.LoginService;
+import com.example.kromannreumert.user.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/auth")

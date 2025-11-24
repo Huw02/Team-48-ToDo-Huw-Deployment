@@ -1,9 +1,9 @@
 package com.example.kromannreumert.unitTest;
 
-import com.example.kromannreumert.securityFeature.entity.LogAction;
-import com.example.kromannreumert.securityFeature.entity.Logging;
-import com.example.kromannreumert.securityFeature.repository.LogRepository;
-import com.example.kromannreumert.securityFeature.service.LoggingService;
+import com.example.kromannreumert.logging.entity.LogAction;
+import com.example.kromannreumert.logging.entity.Logging;
+import com.example.kromannreumert.logging.repository.LogRepository;
+import com.example.kromannreumert.logging.service.LoggingService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;

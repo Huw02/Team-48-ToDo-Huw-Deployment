@@ -1,15 +1,13 @@
-package com.example.kromannreumert.securityFeature.entity;
+package com.example.kromannreumert.user.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 @Entity
 @Getter
 @Setter
-public class Role {
+public class   Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

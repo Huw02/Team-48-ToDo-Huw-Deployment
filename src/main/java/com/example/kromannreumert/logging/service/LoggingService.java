@@ -1,9 +1,8 @@
-package com.example.kromannreumert.securityFeature.service;
+package com.example.kromannreumert.logging.service;
 
-import com.example.kromannreumert.securityFeature.controller.AuthorizeController;
-import com.example.kromannreumert.securityFeature.entity.LogAction;
-import com.example.kromannreumert.securityFeature.entity.Logging;
-import com.example.kromannreumert.securityFeature.repository.LogRepository;
+import com.example.kromannreumert.logging.repository.LogRepository;
+import com.example.kromannreumert.logging.entity.LogAction;
+import com.example.kromannreumert.logging.entity.Logging;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

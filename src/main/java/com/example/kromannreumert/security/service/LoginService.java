@@ -1,11 +1,12 @@
-package com.example.kromannreumert.securityFeature.service;
+package com.example.kromannreumert.security.service;
 
-import com.example.kromannreumert.securityFeature.JwtUtil.JwtGenerator;
-import com.example.kromannreumert.securityFeature.controller.AuthorizeController;
-import com.example.kromannreumert.securityFeature.dto.JwtResponseDTO;
-import com.example.kromannreumert.securityFeature.dto.LoginDTO;
-import com.example.kromannreumert.securityFeature.entity.LogAction;
-import com.example.kromannreumert.securityFeature.entity.User;
+import com.example.kromannreumert.logging.entity.LogAction;
+import com.example.kromannreumert.logging.service.LoggingService;
+import com.example.kromannreumert.security.JwtUtil.JwtGenerator;
+import com.example.kromannreumert.security.dto.JwtResponseDTO;
+import com.example.kromannreumert.security.dto.LoginDTO;
+import com.example.kromannreumert.user.entity.User;
+import com.example.kromannreumert.user.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;

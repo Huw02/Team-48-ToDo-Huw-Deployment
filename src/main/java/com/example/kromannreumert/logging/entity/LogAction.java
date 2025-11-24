@@ -1,4 +1,4 @@
-package com.example.kromannreumert.securityFeature.entity;
+package com.example.kromannreumert.logging.entity;
 
 public enum LogAction {
     CREATE_USER,
