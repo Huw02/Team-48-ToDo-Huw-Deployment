@@ -1,4 +1,4 @@
 package com.example.kromannreumert.client.DTO;
 
-public record UpdateClientName(String name) {
+public record UpdateClientNameDTO(String name) {
 }

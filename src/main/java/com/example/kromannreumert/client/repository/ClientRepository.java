@@ -12,5 +12,4 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     Optional<Client> getClientByIDPrefix(Long idPrefix);
 
     Optional<Client> findClientByName(String name);
-
 }

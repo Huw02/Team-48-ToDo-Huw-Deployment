@@ -1,8 +1,8 @@
 package com.example.kromannreumert.client.service;
 
 import com.example.kromannreumert.client.DTO.CreateClientDTO;
-import com.example.kromannreumert.client.DTO.UpdateClientIdPrefix;
-import com.example.kromannreumert.client.DTO.UpdateClientName;
+import com.example.kromannreumert.client.DTO.UpdateClientIdPrefixDTO;
+import com.example.kromannreumert.client.DTO.UpdateClientNameDTO;
 import com.example.kromannreumert.client.entity.Client;
 import com.example.kromannreumert.client.repository.ClientRepository;
 import org.springframework.stereotype.Service;
@@ -44,15 +44,15 @@ public class ClientService {
     }
 
 
-    public Client updateClientName(UpdateClientName updateClient, String clientName) {
+    public Client updateClientName(UpdateClientNameDTO updateClient, String clientName) {
         Client updatedClient = clientRepository.findClientByName(clientName).orElseThrow(() -> new RuntimeException("Client not found"));
         updatedClient.setName(updateClient.name());
         return clientRepository.save(updatedClient);
     }
 
-    public Client updateClientIdPrefix(String clientName, UpdateClientIdPrefix updateClientIdPrefix) {
+    public Client updateClientIdPrefix(String clientName, UpdateClientIdPrefixDTO updateClientIdPrefixDTO) {
         Client updatedClientId = clientRepository.findClientByName(clientName).orElseThrow(() -> new RuntimeException("Client not found"));
-        updatedClientId.setIDPrefix(updateClientIdPrefix.idPrefix());
+        updatedClientId.setIDPrefix(updateClientIdPrefixDTO.idPrefix());
         return clientRepository.save(updatedClientId);
     }
 
