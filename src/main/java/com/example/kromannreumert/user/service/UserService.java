@@ -30,7 +30,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Override
-    // ---- SPRING SECURITY "AUTO GENERATED" METHOD
+    // ---- SPRING SECURITY "AUTO GENERATED" METHOD -----
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         // Get the user by username
