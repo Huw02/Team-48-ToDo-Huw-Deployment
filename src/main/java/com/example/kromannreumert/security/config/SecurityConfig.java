@@ -25,7 +25,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/auth/login",
                                 "/auth/create",
-                                "/status/healthz")
+                                "/status/healthz",
+                                "/h2-console/**")
                         .permitAll()
 
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
