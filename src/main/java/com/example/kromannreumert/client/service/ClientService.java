@@ -50,6 +50,11 @@ public class ClientService {
         return getClient.getUsers().stream().map(User::getName).toList();
     }
 
+    public int getClientSize() {
+        List<Client> getAll = clientRepository.findAll();
+        return getAll.size();
+    }
+
     public String addClient(ClientRequestDTO client) {
         try {
 

@@ -92,4 +92,12 @@ public class ClientController {
             return new ResponseEntity<>("Failed to retrieve the client user list", HttpStatus.BAD_REQUEST);
         }
    }
+   @GetMapping("/size")
+    public ResponseEntity<?> getClientSize() {
+       try {
+           return new ResponseEntity<>(clientService.getClientSize(), HttpStatus.OK);
+       } catch (RuntimeException e) {
+           return new ResponseEntity<>("Failed to retrieve the client user list", HttpStatus.BAD_REQUEST);
+       }
+   }
 }
