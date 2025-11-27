@@ -30,8 +30,7 @@ public class SecurityConfig {
                         .permitAll()
 
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/v1/manager/**").hasRole("MANAGER")
-                        .requestMatchers("/api/v1/client/**").hasRole("SAGSBEHANDLER")
+                        .requestMatchers("/api/v1/client/**").hasAnyRole("SAGSBEHANDLER", "PARTNER", "ADMIN") // <-- Only the correct role can access
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(
                         oauth -> oauth.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));

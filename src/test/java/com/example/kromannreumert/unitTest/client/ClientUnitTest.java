@@ -1,15 +1,19 @@
 package com.example.kromannreumert.unitTest.client;
 
+import com.example.kromannreumert.client.DTO.ClientRequestDTO;
 import com.example.kromannreumert.client.DTO.ClientResponeDTO;
 import com.example.kromannreumert.client.DTO.UpdateClientIdPrefixDTO;
+import com.example.kromannreumert.client.DTO.UpdateClientNameDTO;
 import com.example.kromannreumert.client.entity.Client;
 import com.example.kromannreumert.client.mapper.ClientMapper;
 import com.example.kromannreumert.client.repository.ClientRepository;
 import com.example.kromannreumert.client.service.ClientService;
 import com.example.kromannreumert.user.entity.Role;
 import com.example.kromannreumert.user.entity.User;
+import com.example.kromannreumert.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -19,10 +23,10 @@ import static org.mockito.Mockito.*;
 
 import java.sql.Date;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @ExtendWith(MockitoExtension.class)
 public class ClientUnitTest {
-
 
     @Mock
     ClientRepository clientRepository;
@@ -30,19 +34,42 @@ public class ClientUnitTest {
     @Mock
     ClientMapper clientMapper;
 
+    @Mock
+    UserRepository userRepository;
+
+
     @InjectMocks
     ClientService clientService;
 
-    @Mock
-    ClientResponeDTO clientResponeDTO;
 
     @Test
-    void getAllClients() {
+    void should_return_all_clients() {
+
+        // ARRANGE
+        Long idPrefix = 1000L;
+        String clientName = "ClientTestName";
+        Client createClient = new Client(1L, clientName, null, idPrefix);
+        ClientResponeDTO convert = new ClientResponeDTO(1L, clientName, null, idPrefix);
+
+        when(clientRepository.findAll()).thenReturn(List.of(createClient));
+        when(clientMapper.toClientDTO(createClient)).thenReturn(convert);
+
+        // ACT
+        List<ClientResponeDTO> result = clientService.getAllClients();
+
+        // ASSERT
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertEquals(1, result.size());
+        assertEquals(createClient.getName(), result.getFirst().name());
+        assertEquals(createClient.getIDPrefix(), result.getFirst().idPrefix());
+        verify(clientRepository).findAll();
+        verify(clientMapper).toClientDTO(createClient);
 
     }
 
     @Test
-    void getClientByIdPrefix() {
+    void should_return_converted_client_to_DTO() {
 
         // ARRANGE
         Date now = new Date(2025-11-25);
@@ -51,100 +78,109 @@ public class ClientUnitTest {
         Set<User> addUsers = Set.of(
                 new User
                         (0L, "test", "test", "test","test", now, Set.of(new Role(1L, "ADMIN"))));
-        Client addClients = new Client(1L,clientName, addUsers,idPrefix);
-        ClientResponeDTO test = new ClientResponeDTO(addClients.getId(), addClients.getName(), List.of("hej"), addClients.getIDPrefix());
+        Client createClient = new Client(1L,clientName, addUsers,idPrefix);
+        ClientResponeDTO convertClient = new ClientResponeDTO(createClient.getId(), createClient.getName(), List.of("hej"), createClient.getIDPrefix());
 
         // ACT
-        when(clientRepository.getClientByIDPrefix(1000L)).thenReturn(Optional.of(addClients));
-        when(clientMapper.toClientDTO(addClients)).thenReturn(test);
+        when(clientRepository.getClientByIDPrefix(1000L)).thenReturn(Optional.of(createClient));
+        when(clientMapper.toClientDTO(createClient)).thenReturn(convertClient);
         ClientResponeDTO result = clientService.getClientByIdPrefix(1000L);
 
         // ASSERT
         assertNotNull(result);
+        assertEquals(createClient.getName(), result.name());
+        assertEquals(createClient.getIDPrefix(), result.idPrefix());
         verify(clientRepository).getClientByIDPrefix(idPrefix);
+        verify(clientMapper).toClientDTO(createClient);
     }
 
     @Test
-    void getClientByName() {
+    void should_return_client_by_clientName() {
 
-//        // ARRANGE
-//        Long idPrefix = 1000L;
-//        String clientName = "ClientTestName";
-//        Set<User> addUsers = Set.of(
-//                new User
-//                        (0L, "test", "test", "test","test", null, null));
-//        Client addClients = new Client(1L,clientName, addUsers,idPrefix);
-//
-//        // ACT
-//        when(clientRepository.findClientByName("ClientTestName")).thenReturn(Optional.of(addClients));
-//        Client result = clientService.getClientByName("ClientTestName");
-//
-//        // ASSERT
-//        assertNotNull(result);
-//        assertEquals(idPrefix, result.getIDPrefix());
-//        assertEquals(clientName, result.getName());
-//        verify(clientRepository).findClientByName("ClientTestName");
+        // ARRANGE
+        Long idPrefix = 1000L;
+        String clientName = "ClientTestName";
+        Client createClient = new Client(1L, clientName, null, idPrefix);
+        ClientResponeDTO convertClient = new ClientResponeDTO(createClient.getId(), createClient.getName(), null, createClient.getIDPrefix());
+
+        when(clientRepository.findClientByName(clientName)).thenReturn(Optional.of(createClient));
+        when(clientMapper.toClientDTO(createClient)).thenReturn(convertClient);
+
+        // ACT
+        ClientResponeDTO result = clientService.getClientByName("ClientTestName");
+
+        // ASSERT
+        assertNotNull(result);
+        assertEquals(createClient.getName(), result.name());
+        assertEquals(createClient.getIDPrefix(), result.idPrefix());
+        assertEquals(createClient.getId(), result.id());
+        verify(clientRepository).findClientByName("ClientTestName");
+        verify(clientMapper).toClientDTO(createClient);
+    }
+
+    @Test
+    void should_return_user_from_client() {
+        // TODO Add unit test for this method
+    }
+
+    @Test
+    void should_add_client_and_return_success() {
+
+        // ARRANGE
+        String clientName = "ClientTest";
+        Long idPrefix = 99000L;
+        User createUser = new User(1L,"TestUser", "Test", "Test@1234", "1234", null, null);
+        Set<String> users = Set.of(createUser.getUsername());
+        ClientRequestDTO createClient = new ClientRequestDTO(clientName, users, idPrefix);
+        Client convertDTOToClient = new Client(null, createClient.clientName(), null, createClient.idPrefix());
+
+        when(clientRepository.save(any(Client.class))).thenReturn(convertDTOToClient);
+        when(userRepository.findByUsername("TestUser")).thenReturn(Optional.of(createUser));
+
+        // ACT
+        String result = clientService.addClient(createClient);
+        String expectedResult = "Client successfully created: " + createClient.clientName();
+
+
+        // ASSERT
+        assertNotNull(result);
+        assertEquals(result, expectedResult);
+        verify(clientRepository).save(any(Client.class));
+        verify(userRepository).findByUsername("TestUser");
 
     }
 
     @Test
-    void addClient() {
+    void should_update_client_name() {
 
+        // ARRANGE
+        UpdateClientNameDTO updateName = new UpdateClientNameDTO("hi", "UpdatedClientName");
+        Client oldClient = new Client(1L, updateName.oldName(), null, null);
+        Client updatedClient = new Client (oldClient.getId(), updateName.newName(), oldClient.users, oldClient.getIDPrefix());
 
-//        // ARRANGE
-//        String clientName = "ClientTest";
-//        Long idPrefix = 99000L;
-//        Set<User> addUsers = Set.of(new User(0L, "test", "test", "test","test", null, null));
-//        CreateClientDTO addClient = new CreateClientDTO(clientName, addUsers, idPrefix);
-//        Client client = new Client(null, addClient.clientName(), addClient.users(), addClient.idPrefix());
-//
-//        // ACT
-//        when(clientRepository.save(any(Client.class))).thenReturn(client);
-//        when(clientRepository.findClientByName(client.getName())).thenReturn(Optional.of(client));
-//
-//
-//        String returnResult = clientService.addClient(addClient);
-//        Client result = clientService.getClientByName(clientName);
-//        String expectedResult = "Client successfully created: " + clientName;
-//
-//        // ASSERT
-//        assertNotNull(returnResult);
-//        assertNotNull(result);
-//        assertEquals(clientName, result.getName());
-//        assertEquals(expectedResult, returnResult);
-//        verify(clientRepository).save(any(Client.class));
-//        verify(clientRepository).findClientByName(clientName);
+        when(clientRepository.findClientByName(oldClient.getName())).thenReturn(Optional.of(oldClient));
+        when(clientRepository.save(any(Client.class))).thenReturn(updatedClient);
+
+        // ACT
+        String result = clientService.updateClientName(updateName);
+        ArgumentCaptor<Client> newNameCaptor = ArgumentCaptor.forClass(Client.class);
+        verify(clientRepository).save(newNameCaptor.capture());
+        String expectedName = newNameCaptor.getValue().getName();
+        String expectedResult = "Successfully updated client with: " + expectedName;
+
+        // ASSERT
+        assertNotNull(result);
+        assertEquals(result, expectedResult);
+        assertNotEquals(expectedName, updateName.oldName());
+        verify(clientRepository).findClientByName(updateName.oldName());
+        verify(clientRepository).save(any(Client.class));
+
     }
 
     @Test
-    void updateClientName() {
+    void should_update_client_idPrefix() {
 
-//        // ARRANGE
-//        String clientName = "ClientTest";
-//        UpdateClientNameDTO updateName = new UpdateClientNameDTO("UpdatedClientName");
-//
-//        Client client = new Client(null, clientName, Set.of(), 99000L);
-//        Client updatedClient = new Client(null, updateName.name(), client.getUsers(), client.getIDPrefix());
-//
-//        when(clientRepository.findClientByName(clientName))
-//                .thenReturn(Optional.of(client));
-//
-//        when(clientRepository.save(any(Client.class)))
-//                .thenReturn(updatedClient);
-//
-//        // ACT
-//        Client result = clientService.updateClientName(updateName, );
-//
-//        // ASSERT
-//        assertEquals(updateName.name(), result.getName());
-//        assertNotNull(result);
-//
-//        verify(clientRepository).findClientByName(clientName);
-//        verify(clientRepository).save(any(Client.class));
-    }
-
-    @Test
-    void updateClientIdPrefix() {
+        // ARRANGE
         Long idPrefix = 9000L;
         String clientName = "TestClientName";
         UpdateClientIdPrefixDTO updateID = new UpdateClientIdPrefixDTO(clientName,9900L);
@@ -155,8 +191,11 @@ public class ClientUnitTest {
         when(clientRepository.findClientByName(clientName)).thenReturn(Optional.of(client));
         when(clientRepository.save(any(Client.class))).thenReturn(updatedClient);
 
+        // ACT
         String result = clientService.updateClientIdPrefix(updateID);
 
+
+        // ASSERT
         assertNotNull(result);
         assertNotEquals(idPrefix, updateID.idPrefix());
         assertEquals(result, "Successfully updated client with: " + updateID.idPrefix());
@@ -165,30 +204,30 @@ public class ClientUnitTest {
     }
 
     @Test
-    void deleteClient() {
+    void should_update_client_userList() {
+        // TODO: Add updateClientUserList test
+    }
+
+    @Test
+    void should_delete_client() {
+
+        // ARRANGE
         String clientName = "DeleteTest";
         Long idPrefix = 9000L;
         Long id = 1L;
         Client client = new Client(id, clientName, Set.of(), idPrefix);
 
-        when(clientRepository.findClientByName(clientName)).thenReturn(Optional.of(client));
-        when(clientRepository.save(any(Client.class))).thenReturn(client);
-        clientRepository.save(client);
-
         doNothing().when(clientRepository).deleteById(id);
 
-        Optional<Client> findClient = clientRepository.findClientByName(clientName);
-        Long resultId = findClient.get().getId();
-        assertNotNull(findClient);
-        String expectedResult = "Client with id: " + resultId + " has been deleted";
+        // ACT
+        String expectedResult = "Client with id: " + id + " has been deleted";
 
-        String result = clientService.deleteClient(resultId);
-
+        // ASSERT
+        String result = clientService.deleteClient(id);
         assertNotNull(result);
         assertEquals(result, expectedResult);
         verify(clientRepository).deleteById(id);
-
-
     }
+
 
 }

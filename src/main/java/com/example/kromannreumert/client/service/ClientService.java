@@ -18,8 +18,6 @@ import java.util.stream.Collectors;
 public class ClientService {
 
 
-    //TODO add method to make it possible to add users to the Client
-
     private final static Logger log = LoggerFactory.getLogger(ClientService.class);
     private final ClientRepository clientRepository;
     private final ClientMapper clientMapper;
@@ -32,6 +30,7 @@ public class ClientService {
     }
 
     public List<ClientResponeDTO> getAllClients() {
+        log.info("Service: Accessed get all clients");
         List<Client> clients = clientRepository.findAll();
         return clients.stream().map(clientMapper::toClientDTO).toList();
     }
@@ -46,6 +45,11 @@ public class ClientService {
         return clientMapper.toClientDTO(client);
     }
 
+    public List<String> getUserFromClient(Long idPrefix) {
+        Client getClient = clientRepository.getClientByIDPrefix(idPrefix).orElseThrow(() -> new RuntimeException("Client not found"));
+        return getClient.getUsers().stream().map(User::getName).toList();
+    }
+
     public String addClient(ClientRequestDTO client) {
         try {
 
@@ -54,6 +58,7 @@ public class ClientService {
                             .orElseThrow(() -> new RuntimeException("User not found: " + username)))
                     .collect(Collectors.toSet());
 
+            // We do not use a mapper here, as we are ^ using a repository call
             Client createClient = new Client(null, client.clientName(), users, client.idPrefix());
             clientRepository.save(createClient);
             // add success log here
@@ -67,10 +72,14 @@ public class ClientService {
 
     // Single responsibility -> that is why I do not combine it with the method below
     public String updateClientName(UpdateClientNameDTO updateClient) {
-        Client updatedClient = clientRepository.findClientByName(updateClient.oldName()).orElseThrow(() -> new RuntimeException("Client not found"));
-        updatedClient.setName(updateClient.newName());
-        clientRepository.save(updatedClient);
-        return "Successfully updated client with: " + updateClient.newName();
+        try {
+            Client updatedClient = clientRepository.findClientByName(updateClient.oldName()).orElseThrow(() -> new RuntimeException("Client not found"));
+            updatedClient.setName(updateClient.newName());
+            clientRepository.save(updatedClient);
+            return "Successfully updated client with: " + updateClient.newName();
+        } catch (RuntimeException e) {
+            return "Could not update the client name";
+        }
 
     }
 
@@ -94,12 +103,6 @@ public class ClientService {
     public String deleteClient(Long id) {
         clientRepository.deleteById(id);
         return "Client with id: " + id + " has been deleted";
-    }
-
-    //TODO need to convert this to return only the users name and not more
-    public List<String> getUserFromClient(Long idPrefix) {
-        Client getClient = clientRepository.getClientByIDPrefix(idPrefix).orElseThrow(() -> new RuntimeException("Client not found"));
-        return getClient.getUsers().stream().map(User::getName).toList();
     }
 
 }
