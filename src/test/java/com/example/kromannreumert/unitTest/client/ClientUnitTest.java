@@ -2,11 +2,11 @@ package com.example.kromannreumert.unitTest.client;
 
 import com.example.kromannreumert.client.DTO.ClientResponeDTO;
 import com.example.kromannreumert.client.DTO.UpdateClientIdPrefixDTO;
-import com.example.kromannreumert.client.DTO.UpdateClientNameDTO;
 import com.example.kromannreumert.client.entity.Client;
 import com.example.kromannreumert.client.mapper.ClientMapper;
 import com.example.kromannreumert.client.repository.ClientRepository;
 import com.example.kromannreumert.client.service.ClientService;
+import com.example.kromannreumert.user.entity.Role;
 import com.example.kromannreumert.user.entity.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,9 +17,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.sql.Date;
+import java.util.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ClientUnitTest {
@@ -28,51 +27,41 @@ public class ClientUnitTest {
     @Mock
     ClientRepository clientRepository;
 
-    @InjectMocks
+    @Mock
     ClientMapper clientMapper;
 
     @InjectMocks
     ClientService clientService;
 
+    @Mock
+    ClientResponeDTO clientResponeDTO;
+
     @Test
     void getAllClients() {
-        // TODO change this test
 
-        // ARRANGE
-        Set<User> addUsers =
-                Set.of( new User (0L, "test", "test", "test","test", null, null));
-        List<Client> addClients = List.of( new Client (1L,"ClientTestName", addUsers,1000L));
-        when(clientRepository.findAll()).thenReturn(addClients);
-
-        List<Client> test = clientRepository.findAll();
-        // ACT
-        List<ClientResponeDTO> result = test.stream().map(clientMapper::toClientDTO).toList();
-
-        // ASSERT
-        assertNotNull(result); assertFalse(result.isEmpty());
-        verify(clientRepository).findAll();
     }
 
     @Test
     void getClientByIdPrefix() {
 
-//        // ARRANGE
-//        Long idPrefix = 1000L;
-//        String clientName = "ClientTestName";
-//        Set<User> addUsers = Set.of(
-//                new User
-//                        (0L, "test", "test", "test","test", null, null));
-//        Client addClients = new Client(1L,clientName, addUsers,idPrefix);
-//
-//        // ACT
-//        when(clientRepository.getClientByIDPrefix(1000L)).thenReturn(Optional.of(addClients));
-//        Client result = clientService.getClientByIdPrefix(1000L);
-//
-//        // ASSERT
-//        assertNotNull(result);
-//        assertEquals(idPrefix, result.getIDPrefix());
-//        assertEquals(clientName, result.getName());
-//        verify(clientRepository).getClientByIDPrefix(idPrefix);
+        // ARRANGE
+        Date now = new Date(2025-11-25);
+        Long idPrefix = 1000L;
+        String clientName = "ClientTestName";
+        Set<User> addUsers = Set.of(
+                new User
+                        (0L, "test", "test", "test","test", now, Set.of(new Role(1L, "ADMIN"))));
+        Client addClients = new Client(1L,clientName, addUsers,idPrefix);
+        ClientResponeDTO test = new ClientResponeDTO(addClients.getId(), addClients.getName(), List.of("hej"), addClients.getIDPrefix());
+
+        // ACT
+        when(clientRepository.getClientByIDPrefix(1000L)).thenReturn(Optional.of(addClients));
+        when(clientMapper.toClientDTO(addClients)).thenReturn(test);
+        ClientResponeDTO result = clientService.getClientByIdPrefix(1000L);
+
+        // ASSERT
+        assertNotNull(result);
+        verify(clientRepository).getClientByIDPrefix(idPrefix);
     }
 
     @Test

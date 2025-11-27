@@ -76,13 +76,16 @@ public class ClientController {
        try {
            return new ResponseEntity<>(clientService.updateClientUserList(clientUserList), HttpStatus.OK);
        } catch (RuntimeException e) {
-           System.out.println(clientUserList.user());
            return new ResponseEntity<>("Failed to update the client: " + clientUserList, HttpStatus.BAD_REQUEST);
        }
    }
 
    @GetMapping("/user/{idprefix}")
     public ResponseEntity<?> getUserByClient(@PathVariable Long idprefix) {
-        return new ResponseEntity<>(clientService.getUserFromClient(idprefix), HttpStatus.OK);
+        try {
+            return new ResponseEntity<>(clientService.getUserFromClient(idprefix), HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>("Failed to retrieve the client user list", HttpStatus.BAD_REQUEST);
+        }
    }
 }

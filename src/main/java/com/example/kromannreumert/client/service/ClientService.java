@@ -97,10 +97,9 @@ public class ClientService {
     }
 
     //TODO need to convert this to return only the users name and not more
-    public List<User> getUserFromClient(Long idPrefix) {
+    public List<String> getUserFromClient(Long idPrefix) {
         Client getClient = clientRepository.getClientByIDPrefix(idPrefix).orElseThrow(() -> new RuntimeException("Client not found"));
-        return getClient.users.stream().toList();
-
+        return getClient.getUsers().stream().map(User::getName).toList();
     }
 
 }
