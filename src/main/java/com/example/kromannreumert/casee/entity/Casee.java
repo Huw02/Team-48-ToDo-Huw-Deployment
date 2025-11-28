@@ -34,6 +34,13 @@ public class Casee {
     )
     public Set<User> users;
 
-    public Long IdPrefix;
+    public Long idPrefix;
+
+    public Casee(String name, Client client, Set<User> users, Long idPrefix) {
+        this.name = name;
+        this.client = client;
+        this.users = users;
+        this.idPrefix = idPrefix;
+    }
 
 }
