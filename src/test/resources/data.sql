@@ -1,6 +1,9 @@
 INSERT INTO role (id, role_name) VALUES
                                      (1, 'ADMIN'),
-                                     (2, 'USER');
+                                     (2, 'PARTNER'),
+                                     (3, 'SAGSBEHANDLER'),
+                                     (4, 'JURIST');
+
 
 INSERT INTO users (user_id, username, name, email, password, created_date) VALUES
                                                                                (1, 'jdoe', 'John Doe', 'john@example.com', 'password', CURRENT_TIMESTAMP),

@@ -1,46 +1,44 @@
-package com.example.kromannreumert.unitTest.user;
+package com.example.kromannreumert.unitTest.client;
 
+import com.example.kromannreumert.client.controller.ClientController;
+import com.example.kromannreumert.client.service.ClientService;
+import com.example.kromannreumert.logging.controller.LogController;
 import com.example.kromannreumert.security.config.SecurityConfig;
-import com.example.kromannreumert.user.controller.UserController;
-import com.example.kromannreumert.user.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-@WebMvcTest(controllers = UserController.class)
+@WebMvcTest(controllers = ClientController.class)
 @Import(SecurityConfig.class)
-public class UserUnitTestController {
+@ActiveProfiles("test")
 
-
+public class ClientControllerUnitTest {
     @Autowired
     MockMvc mockMvc;
 
     @MockitoBean
-    UserService userService;
-
+    ClientService clientService;
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    void getAllUsersWhileLoggedIn() throws Exception{
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/user"))
+    void should_return_isOK_for_Admin() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/client/"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
 
     @Test
-    void getAllUsersNotLoggedIn() throws Exception{
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/user"))
-                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
+    @WithMockUser(roles = "SAGSBEHANDLER")
+    void should_return_isOK_for_sagsbehandler() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/client/"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
-
-
-
-
 
 }

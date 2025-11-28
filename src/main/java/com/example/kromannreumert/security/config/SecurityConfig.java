@@ -31,27 +31,21 @@ public class SecurityConfig {
                                 "/h2-console/**")
                         .permitAll()
 
-                        .requestMatchers("/api/v1/**").hasRole("ADMIN")
-
                         //giver Sagsbehandler specifikt adgang til GET endpoints i /clients
                         .requestMatchers(HttpMethod.GET, "/api/v1/clients/**").hasRole("SAGSBEHANDLER")
-                        .requestMatchers("/api/v1/clients/**").hasRole("PARTNER")
-
-                        //giver jurist specifikt adgang til GET endpoints i /cases
                         .requestMatchers(HttpMethod.GET, "/api/v1/cases/**").hasRole("JURIST")
+
+                        .requestMatchers("/api/v1/clients/**").hasRole("PARTNER")
                         .requestMatchers("/api/v1/cases/**").hasAnyRole("PARTNER", "SAGSBEHANDLER")
-
-
                         .requestMatchers("/api/v1/todos/**").hasAnyRole("PARTNER", "SAGSBEHANDLER", "JURIST")
 
-
-
-
                         .anyRequest().authenticated())
-                
+
+
                 .oauth2ResourceServer(
                         oauth -> oauth.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
 
+        
     return http.build();
     };
 
