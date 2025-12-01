@@ -9,6 +9,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
@@ -22,14 +25,18 @@ public class ToDo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String name;
+
     private String description;
 
     @ManyToOne
     private Casee caseId;
 
-    private Date startDate;
+    private LocalDateTime created;
 
-    private Date endDate;
+    private LocalDate startDate;
+
+    private LocalDate endDate;
 
     @Enumerated(EnumType.STRING)
     private Priority priority;
@@ -46,4 +53,15 @@ public class ToDo {
             inverseJoinColumns = @JoinColumn(name = "todo_id")
     )
     private Set<User> users;
+
+    public ToDo(String name, String description, LocalDateTime created, LocalDate startDate, LocalDate endDate, Priority priority, Status status, Boolean archived) {
+        this.name = name;
+        this.description = description;
+        this.created = created;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.priority = priority;
+        this.status = status;
+        this.archived = archived;
+    }
 }
