@@ -2,8 +2,9 @@ package com.example.kromannreumert.todo.service;
 
 import com.example.kromannreumert.logging.entity.LogAction;
 import com.example.kromannreumert.logging.service.LoggingService;
+import com.example.kromannreumert.todo.dto.ToDoRequestDto;
+import com.example.kromannreumert.todo.dto.ToDoRequestNewToDoDto;
 import com.example.kromannreumert.todo.dto.ToDoResponseDto;
-import com.example.kromannreumert.todo.dto.TodoRequestDto;
 import com.example.kromannreumert.todo.entity.ToDo;
 import com.example.kromannreumert.todo.mapper.ToDoMapper;
 import com.example.kromannreumert.todo.repository.ToDoRepository;
@@ -60,7 +61,7 @@ public class ToDoService {
         }
     }
 
-    public ToDoResponseDto createToDo(String name, TodoRequestDto todoRequestDto) {
+    public ToDoResponseDto createToDo(String name, ToDoRequestNewToDoDto todoRequestDto) {
         try {
             ToDo toDo = toDoMapper.toToDo(todoRequestDto);
             toDo = toDoRepository.save(toDo);
@@ -88,7 +89,7 @@ public class ToDoService {
         }
     }
 
-    public ToDoResponseDto updateTodo(Long id, String name, TodoRequestDto todoRequestDto) {
+    public ToDoResponseDto updateTodo(Long id, String name, ToDoRequestDto todoRequestDto) {
         try {
             ToDo todo = toDoRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Could not find todo with id: " + id));
@@ -97,7 +98,10 @@ public class ToDoService {
             todo.setDescription(todoRequestDto.description());
             todo.setStartDate(todoRequestDto.startDate());
             todo.setEndDate(todoRequestDto.endDate());
+            todo.setUsers(todoRequestDto.toDoAssignees());
             todo.setPriority(todoRequestDto.priority());
+            todo.setStatus(todoRequestDto.status());
+            todo.setArchived(todoRequestDto.archived());
 
             toDoRepository.save(todo);
             loggingService.log(LogAction.UPDATE_TODO, name, "Updated todo: " + todoRequestDto.name());

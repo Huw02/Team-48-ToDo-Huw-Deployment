@@ -1,7 +1,8 @@
 package com.example.kromannreumert.todo.controller;
 
+import com.example.kromannreumert.todo.dto.ToDoRequestDto;
+import com.example.kromannreumert.todo.dto.ToDoRequestNewToDoDto;
 import com.example.kromannreumert.todo.dto.ToDoResponseDto;
-import com.example.kromannreumert.todo.dto.TodoRequestDto;
 import com.example.kromannreumert.todo.service.ToDoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +44,7 @@ public class ToDoController {
     }
 
     @PostMapping("/todos")
-    public ResponseEntity<ToDoResponseDto> createToDo(@RequestBody TodoRequestDto todoRequestDto, Principal principal) {
+    public ResponseEntity<ToDoResponseDto> createToDo(@RequestBody ToDoRequestNewToDoDto todoRequestDto, Principal principal) {
         try {
             ToDoResponseDto responseDto = toDoService.createToDo(principal.getName(), todoRequestDto);
             URI location = URI.create("/todos" + responseDto.id());
@@ -64,7 +65,7 @@ public class ToDoController {
     }
 
     @PutMapping("/todos/{id}")
-    public ResponseEntity<ToDoResponseDto> updateTodo(@PathVariable Long id, @RequestBody TodoRequestDto todoRequestDto, Principal principal) {
+    public ResponseEntity<ToDoResponseDto> updateTodo(@PathVariable Long id, @RequestBody ToDoRequestDto todoRequestDto, Principal principal) {
         try {
             ToDoResponseDto toDoResponseDto = toDoService.updateTodo(id, principal.getName(), todoRequestDto);
             return ResponseEntity.ok(toDoResponseDto);

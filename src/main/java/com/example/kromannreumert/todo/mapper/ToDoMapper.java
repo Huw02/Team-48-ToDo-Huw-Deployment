@@ -1,19 +1,17 @@
 package com.example.kromannreumert.todo.mapper;
 
+import com.example.kromannreumert.todo.dto.ToDoRequestNewToDoDto;
 import com.example.kromannreumert.todo.dto.ToDoResponseDto;
-import com.example.kromannreumert.todo.dto.TodoRequestDto;
 import com.example.kromannreumert.todo.entity.Status;
 import com.example.kromannreumert.todo.entity.ToDo;
 import org.springframework.stereotype.Component;
 
-import java.sql.Time;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Component
 public class ToDoMapper {
 
-    public ToDo toToDo(TodoRequestDto todoRequestDto) {
+    public ToDo toToDo(ToDoRequestNewToDoDto todoRequestDto) {
         return new ToDo(
                 todoRequestDto.name(),
                 todoRequestDto.description(),
@@ -26,6 +24,7 @@ public class ToDoMapper {
         );
     }
 
+
     public ToDoResponseDto toToDoResponseDto(ToDo toDo) {
         return new ToDoResponseDto(
                 toDo.getId(),
@@ -35,6 +34,8 @@ public class ToDoMapper {
                 toDo.getStartDate(),
                 toDo.getEndDate(),
                 toDo.getUsers(),
+                toDo.getPriority(),
+                toDo.getStatus(),
                 toDo.getArchived()
         );
     }

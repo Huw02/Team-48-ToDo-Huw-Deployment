@@ -4,7 +4,7 @@ import com.example.kromannreumert.todo.entity.Priority;
 
 import java.time.LocalDate;
 
-public record TodoRequestDto(
+public record ToDoRequestNewToDoDto(
         String name,
         String description,
         LocalDate startDate,
