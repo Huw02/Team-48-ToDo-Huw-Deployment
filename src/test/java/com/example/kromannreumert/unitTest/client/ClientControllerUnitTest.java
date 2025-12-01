@@ -408,6 +408,7 @@ public class ClientControllerUnitTest {
         verify(clientService).updateClientName(dto);
     }
 
+    // ALL TEST DONE
     @Test
     @WithMockUser(roles = "ADMIN")
     void should_updateClientUsers_andReturnOK() throws Exception {
