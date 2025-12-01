@@ -39,6 +39,7 @@ public class ClientController {
         }
     }
 
+    // This endpoints needs to be removed or changed as there can contain spaces in a client name.
     @GetMapping("/getclientbyname/{clientName}")
     public ResponseEntity<?> getClientByClientName(@PathVariable String clientName) {
         try {

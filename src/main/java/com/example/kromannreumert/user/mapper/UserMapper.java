@@ -30,6 +30,7 @@ public class UserMapper {
         user.setRoles(roles);
 
         return user;
+
     }
 
     public UserResponseDTO toUserResponseDTO(User user){

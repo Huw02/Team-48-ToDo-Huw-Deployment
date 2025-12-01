@@ -36,8 +36,7 @@ INSERT INTO logging (actor, action, details, timestamp) VALUES
 
 INSERT INTO client_assignee (user_id, client_id) VALUES
         (2, 1),
-        (2, 2),
-        (3, 1);
+        (2, 2);
 
 INSERT INTO case_assignee (user_id, case_id) VALUES
         (2, 1),

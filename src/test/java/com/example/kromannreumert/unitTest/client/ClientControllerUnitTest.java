@@ -1,7 +1,6 @@
 package com.example.kromannreumert.unitTest.client;
 
-import com.example.kromannreumert.client.DTO.ClientRequestDTO;
-import com.example.kromannreumert.client.DTO.ClientResponeDTO;
+import com.example.kromannreumert.client.DTO.*;
 import com.example.kromannreumert.client.controller.ClientController;
 import com.example.kromannreumert.client.entity.Client;
 import com.example.kromannreumert.client.service.ClientService;
@@ -23,8 +22,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -368,7 +366,129 @@ public class ClientControllerUnitTest {
         verify(clientService, never()).deleteClient(100L);
     }
 
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void should_updateClientIdPrefix_andReturnOK() throws Exception {
 
+        UpdateClientIdPrefixDTO dto =
+                new UpdateClientIdPrefixDTO("ClientA", 9000L);
 
+        when(clientService.updateClientIdPrefix(dto))
+                .thenReturn("Updated ID prefix");
+
+        mockMvc.perform(
+                        patch("/api/v1/client/update/id")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value("Updated ID prefix"));
+
+        verify(clientService).updateClientIdPrefix(dto);
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void should_updateClientName_andReturnOK() throws Exception {
+
+        UpdateClientNameDTO dto =
+                new UpdateClientNameDTO("OldName", "NewName");
+
+        when(clientService.updateClientName(dto))
+                .thenReturn("Updated client name");
+
+        mockMvc.perform(
+                        patch("/api/v1/client/update/name")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value("Updated client name"));
+
+        verify(clientService).updateClientName(dto);
+    }
+
+    // ALL TEST DONE
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void should_updateClientUsers_andReturnOK() throws Exception {
+
+        UpdateClientUserList dto =
+                new UpdateClientUserList(9000L, Set.of("User1", "User2"));
+
+        when(clientService.updateClientUserList(dto))
+                .thenReturn("Updated user list");
+
+        mockMvc.perform(
+                        put("/api/v1/client/update/users")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value("Updated user list"));
+
+        verify(clientService).updateClientUserList(dto);
+    }
+
+    @Test
+    @WithMockUser(roles = "PARTNER")
+    void should_updateClientUsers_andReturnOK_partner() throws Exception {
+
+        UpdateClientUserList dto =
+                new UpdateClientUserList(9000L, Set.of("User1", "User2"));
+
+        when(clientService.updateClientUserList(dto))
+                .thenReturn("Updated user list");
+
+        mockMvc.perform(
+                        put("/api/v1/client/update/users")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value("Updated user list"));
+
+        verify(clientService).updateClientUserList(dto);
+    }
+
+    @Test
+    @WithMockUser(roles = "SAGSBEHANDLER")
+    void should_updateClientUsers_andReturnOK_sagsbehandler() throws Exception {
+
+        UpdateClientUserList dto =
+                new UpdateClientUserList(9000L, Set.of("User1", "User2"));
+
+        when(clientService.updateClientUserList(dto))
+                .thenReturn("Updated user list");
+
+        mockMvc.perform(
+                        put("/api/v1/client/update/users")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value("Updated user list"));
+
+        verify(clientService).updateClientUserList(dto);
+    }
+
+    @Test
+    @WithMockUser(roles = "JURIST")
+    void should_not_updateClientUsers_andReturnIsForbidden() throws Exception {
+
+        UpdateClientUserList dto =
+                new UpdateClientUserList(9000L, Set.of("User1", "User2"));
+
+        when(clientService.updateClientUserList(dto))
+                .thenReturn("Updated user list");
+
+        mockMvc.perform(
+                        put("/api/v1/client/update/users")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(dto))
+                )
+                .andExpect(status().isForbidden());
+        verify(clientService, never()).updateClientUserList(dto);
+    }
 }
 

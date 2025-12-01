@@ -4,6 +4,7 @@ import com.example.kromannreumert.client.DTO.*;
 import com.example.kromannreumert.client.entity.Client;
 import com.example.kromannreumert.client.mapper.ClientMapper;
 import com.example.kromannreumert.client.repository.ClientRepository;
+import com.example.kromannreumert.logging.service.LoggingService;
 import com.example.kromannreumert.user.entity.User;
 import com.example.kromannreumert.user.repository.UserRepository;
 import org.slf4j.Logger;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -22,17 +24,23 @@ public class ClientService {
     private final ClientRepository clientRepository;
     private final ClientMapper clientMapper;
     private final UserRepository userRepository;
+    private final LoggingService loggingService;
 
-    public ClientService(ClientRepository clientRepository, ClientMapper clientMapper, UserRepository userRepository) {
+    public ClientService(ClientRepository clientRepository, ClientMapper clientMapper, UserRepository userRepository, LoggingService loggingService) {
         this.clientRepository = clientRepository;
         this.clientMapper = clientMapper;
         this.userRepository = userRepository;
+        this.loggingService = loggingService;
     }
 
     public List<ClientResponeDTO> getAllClients() {
-        log.info("Service: Accessed get all clients");
-        List<Client> clients = clientRepository.findAll();
-        return clients.stream().map(clientMapper::toClientDTO).toList();
+        try {
+            List<Client> clients = clientRepository.findAll();
+            return clients.stream().map(clientMapper::toClientDTO).toList();
+        } catch (Exception e) {
+            throw new RuntimeException("fuck dig");
+        }
+
     }
 
     public ClientResponeDTO getClientByIdPrefix(Long idPrefix){
@@ -79,7 +87,13 @@ public class ClientService {
     public String updateClientName(UpdateClientNameDTO updateClient) {
         try {
             Client updatedClient = clientRepository.findClientByName(updateClient.oldName()).orElseThrow(() -> new RuntimeException("Client not found"));
+
+            if (Objects.equals(updatedClient.getName(), updateClient.newName())) {
+                return "Cannot update the same name";
+            }
+
             updatedClient.setName(updateClient.newName());
+
             clientRepository.save(updatedClient);
             return "Successfully updated client with: " + updateClient.newName();
         } catch (RuntimeException e) {
@@ -91,6 +105,9 @@ public class ClientService {
     // Single responsibility -> that is why I do not combine it with the method below
     public String updateClientIdPrefix(UpdateClientIdPrefixDTO updateClient) {
         Client updatedClientId = clientRepository.findClientByName(updateClient.clientName()).orElseThrow(() -> new RuntimeException("Client not found"));
+        if (Objects.equals(updatedClientId.getIDPrefix(), updateClient.idPrefix())) {
+            return "Cannot update the same id";
+        }
         updatedClientId.setIDPrefix(updateClient.idPrefix());
         clientRepository.save(updatedClientId);
 

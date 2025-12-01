@@ -34,6 +34,11 @@ public class Logging {
         this.details = details;
     }
 
+    public void Logging(LogAction action, String actor, String details, Long oldPrefix) {
+
+    }
+
+
 
     @Override
     public String toString() {
