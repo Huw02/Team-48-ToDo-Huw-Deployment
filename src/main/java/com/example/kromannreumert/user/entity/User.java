@@ -32,7 +32,6 @@ public class User {
     @NotNull
     private String name;
 
-    @Email
     @NotNull
     private String email;
 

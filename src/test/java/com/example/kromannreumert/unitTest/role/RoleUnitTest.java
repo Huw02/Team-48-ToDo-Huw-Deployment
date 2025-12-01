@@ -108,17 +108,16 @@ public class RoleUnitTest {
 
     }
 
-    /*
+
     @Test
     void createRole(){
         //ARRANGE
-        Role first = new Role("ADMIN");
-        Role firstDone = new Role(1L, "ADMIN");
-        RoleRequestDTO requestDTO = new RoleRequestDTO("ADMIN");
+        Role firstDone = new Role(1L, "Test");
+        RoleRequestDTO requestDTO = new RoleRequestDTO("Test");
 
 
 
-        when(roleRepository.save(first)).thenReturn(firstDone);
+        when(roleRepository.save(any(Role.class))).thenReturn(firstDone);
 
 
         //ACT
@@ -128,16 +127,36 @@ public class RoleUnitTest {
         //ASSERT
         assertNotNull(response);
         assertEquals(1L, response.id());
-        assertEquals("ADMIN", response.role());
+        assertEquals("Test", response.roleName());
 
         //VERIFY
         verify(roleRepository, times(1)).save(any());
 
 
-    } */
+    }
 
     @Test
     void updateRole(){
+        Role firstDone = new Role(1L, "Test");
+        RoleRequestDTO requestDTO = new RoleRequestDTO("Test");
+
+
+        when(roleRepository.findById(1)).thenReturn(Optional.of(firstDone));
+
+        when(roleRepository.save(any(Role.class))).thenReturn(firstDone);
+
+
+        //ACT
+        RoleResponseDTO response = roleService.updateRole(1, requestDTO, "testUser");
+
+
+        //ASSERT
+        assertNotNull(response);
+        assertEquals(1L, response.id());
+        assertEquals("Test", response.roleName());
+
+        //VERIFY
+        verify(roleRepository, times(1)).save(any());
 
     }
 
