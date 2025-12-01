@@ -134,7 +134,7 @@ public class ClientService {
 
             clientRepository.save(updatedClient);
 
-            loggingService.log(LogAction.UPDATE_CLIENT, name, "Updated client name to: " + updateClient.newName());
+            loggingService.log(LogAction.UPDATE_CLIENT, name, "Updated client name to: " + updateClient.newName() + " from: " + updateClient.oldName());
             return "Successfully updated client with: " + updateClient.newName();
         } catch (RuntimeException e) {
             loggingService.log(LogAction.UPDATE_CLIENT_FAILED, name, "Failed to update client name for: " + updateClient.oldName());
