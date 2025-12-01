@@ -3,6 +3,7 @@ package com.example.kromannreumert.casee.entity;
 import com.example.kromannreumert.client.entity.Client;
 import com.example.kromannreumert.user.entity.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,6 +27,9 @@ public class Casee {
     @ManyToOne
     private Client client;
 
+    @ManyToOne
+    private User responsibleUser;
+
     @ManyToMany
     @JoinTable(
             name = "case_assignee",
@@ -34,6 +38,8 @@ public class Casee {
     )
     public Set<User> users;
 
+    @NotNull
+    @Column(unique = true)
     public Long idPrefix;
 
     public Casee(String name, Client client, Set<User> users, Long idPrefix) {

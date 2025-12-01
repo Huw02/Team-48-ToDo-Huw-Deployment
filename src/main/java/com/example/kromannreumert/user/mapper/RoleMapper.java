@@ -10,7 +10,7 @@ public class RoleMapper {
 
     public Role toRole(RoleRequestDTO roleRequestDTO){
         return new Role(
-                roleRequestDTO.role()
+                roleRequestDTO.roleName()
         );
     }
 

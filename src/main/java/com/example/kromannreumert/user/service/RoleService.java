@@ -73,7 +73,7 @@ public class RoleService {
     public RoleResponseDTO createRole(RoleRequestDTO roleRequestDTO, String name) {
         try {
             Role role = new Role(
-                    roleRequestDTO.role()
+                    roleRequestDTO.roleName()
             );
 
             Role roleFromDb = roleRepository.save(role);
@@ -85,7 +85,7 @@ public class RoleService {
                     roleFromDb.getRoleName()
             );
         } catch (RuntimeException e) {
-            loggingService.log(LogAction.CREATE_ROLE_FAILED, name, "Failed to create role: " + roleRequestDTO.role());
+            loggingService.log(LogAction.CREATE_ROLE_FAILED, name, "Failed to create role: " + roleRequestDTO.roleName());
             throw new RuntimeException("Could not create role");
         }
     }
@@ -95,7 +95,7 @@ public class RoleService {
         try {
             Role role = roleRepository.findById(roleId).get();
 
-            role.setRoleName(requestDTO.role());
+            role.setRoleName(requestDTO.roleName());
 
             Role roleFromDb = roleRepository.save(role);
 

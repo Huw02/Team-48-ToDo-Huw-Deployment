@@ -1,4 +1,4 @@
 package com.example.kromannreumert.user.dto;
 
-public record RoleRequestDTO(String role) {
+public record RoleRequestDTO(String roleName) {
 }
