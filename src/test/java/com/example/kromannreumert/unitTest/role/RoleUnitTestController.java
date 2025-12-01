@@ -4,6 +4,7 @@ import com.example.kromannreumert.security.config.SecurityConfig;
 import com.example.kromannreumert.user.controller.RoleController;
 import com.example.kromannreumert.user.dto.RoleRequestDTO;
 import com.example.kromannreumert.user.dto.RoleResponseDTO;
+import com.example.kromannreumert.user.entity.Role;
 import com.example.kromannreumert.user.service.RoleService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -18,9 +19,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = RoleController.class)
 @Import(SecurityConfig.class)
@@ -36,11 +43,19 @@ public class RoleUnitTestController {
     @Autowired
     ObjectMapper objectMapper;
 
+    private final String baseURL = "/api/v1/role";
+
     @Test
-    @WithMockUser(roles = "ADMIN")
+    @WithMockUser(username = "testUser", roles = "ADMIN")
     void getAllRolesWhileLoggedIn() throws Exception{
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/role"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        List<RoleResponseDTO>roles = Arrays.asList(new RoleResponseDTO(1L, "ADMIN"), new RoleResponseDTO(2L, "Partner"));
+        when(roleService.getAllRoles("testUser")).thenReturn(roles);
+
+
+        mockMvc.perform(get(baseURL))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].id").value(1))
+                .andExpect(jsonPath("$[0].role").value("ADMIN"));
     }
 
     @Test
@@ -71,8 +86,19 @@ public class RoleUnitTestController {
 
 
     @Test
-    @WithMockUser(roles = "ADMIN")
+    @WithMockUser(username = "testUser", roles = "ADMIN")
     void getSpecifikRoleWhileLoggedIn() throws Exception{
+
+        RoleResponseDTO role = new RoleResponseDTO(1L, "ADMIN");
+        when(roleService.getRolebyRoleId(1, "testUser")).thenReturn(role);
+
+
+        mockMvc.perform(get(baseURL + "/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.role").value("ADMIN"));
+
+
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/role/1"))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
@@ -85,18 +111,21 @@ public class RoleUnitTestController {
 
 
     @Test
-    @WithMockUser(username = "huw", roles = "ADMIN")
+    @WithMockUser(username = "testUser", roles = "ADMIN")
     void createRoleWhileLoggedIn() throws Exception{
-        RoleRequestDTO request = new RoleRequestDTO("ADMIN");
         RoleResponseDTO response = new RoleResponseDTO(1L, "ADMIN");
+        RoleRequestDTO request = new RoleRequestDTO("ADMIN");
 
-        when(roleService.createRole(any(RoleRequestDTO.class), eq("huw"))).thenReturn(response);
 
+        when(roleService.createRole(any(RoleRequestDTO.class), eq("testUser"))).thenReturn(response);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/role")
+        mockMvc.perform(post(baseURL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(MockMvcResultMatchers.status().isCreated());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.role").value("ADMIN"));
+
     }
 
     @Test
@@ -114,19 +143,21 @@ public class RoleUnitTestController {
     }
 
     @Test
-    @WithMockUser(username = "huw", roles = "ADMIN")
+    @WithMockUser(username = "testUser", roles = "ADMIN")
     void updateRoleWhileLoggedIn() throws Exception{
         RoleRequestDTO request = new RoleRequestDTO("ADMIN");
         RoleResponseDTO response = new RoleResponseDTO(1L, "ADMIN");
 
-        when(roleService.getRolebyRoleId(eq(1), eq("huw"))).thenReturn(response);
-        when(roleService.updateRole(eq(1), any(RoleRequestDTO.class), eq("huw"))).thenReturn(response);
+        when(roleService.getRolebyRoleId(eq(1), eq("testUser"))).thenReturn(response);
+        when(roleService.updateRole(eq(1), any(RoleRequestDTO.class), eq("testUser"))).thenReturn(response);
 
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/role/1")
+        mockMvc.perform(put(baseURL + "/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.role").value("ADMIN"));
+
     }
 
     @Test
@@ -150,8 +181,10 @@ public class RoleUnitTestController {
 
         when(roleService.getRolebyRoleId(eq(1), eq("huw"))).thenReturn(response);
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/role/1"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+        mockMvc.perform(delete(baseURL + "/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value("The role was deleted"));
+
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.example.kromannreumert.unitTest.role;
 
 import com.example.kromannreumert.logging.service.LoggingService;
+import com.example.kromannreumert.user.dto.RoleRequestDTO;
 import com.example.kromannreumert.user.dto.RoleResponseDTO;
 import com.example.kromannreumert.user.entity.Role;
 import com.example.kromannreumert.user.mapper.RoleMapper;
@@ -107,11 +108,33 @@ public class RoleUnitTest {
 
     }
 
-
+    /*
     @Test
     void createRole(){
+        //ARRANGE
+        Role first = new Role("ADMIN");
+        Role firstDone = new Role(1L, "ADMIN");
+        RoleRequestDTO requestDTO = new RoleRequestDTO("ADMIN");
 
-    }
+
+
+        when(roleRepository.save(first)).thenReturn(firstDone);
+
+
+        //ACT
+        RoleResponseDTO response = roleService.createRole(requestDTO, "testUser");
+
+
+        //ASSERT
+        assertNotNull(response);
+        assertEquals(1L, response.id());
+        assertEquals("ADMIN", response.role());
+
+        //VERIFY
+        verify(roleRepository, times(1)).save(any());
+
+
+    } */
 
     @Test
     void updateRole(){
