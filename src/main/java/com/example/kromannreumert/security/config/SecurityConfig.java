@@ -33,7 +33,7 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/v1/client/**").hasAnyRole("ADMIN", "PARTNER", "SAGSBEHANDLER") // <--- 2) This
                         .requestMatchers("/api/v1/cases/**").hasAnyRole("PARTNER", "SAGSBEHANDLER")
-                        .requestMatchers("/api/v1/todos/**").hasAnyRole("PARTNER", "SAGSBEHANDLER", "JURIST")
+                        .requestMatchers("/api/v1/todos/**").hasAnyRole("ADMIN", "PARTNER", "SAGSBEHANDLER", "JURIST")
                         .requestMatchers("/api/v1/role/**", "/api/v1/user/**").hasRole("ADMIN")
 
                         // Had to change the order for it to work dont know why

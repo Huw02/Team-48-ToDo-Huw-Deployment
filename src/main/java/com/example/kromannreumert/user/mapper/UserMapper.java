@@ -22,13 +22,15 @@ public class UserMapper {
         Role role = roleService.getRoleById(userRequestDTO.roleId());
         Set<Role>roles = Set.of(role);
 
-        return new User(
-                userRequestDTO.username(),
-                userRequestDTO.email(),
-                userRequestDTO.name(),
-                userRequestDTO.password(),
-                roles
-        );
+        User user = new User();
+        user.setUsername(userRequestDTO.username());
+        user.setName(userRequestDTO.name());
+        user.setEmail(userRequestDTO.email());
+        user.setPassword(userRequestDTO.password());
+        user.setRoles(roles);
+
+        return user;
+
     }
 
     public UserResponseDTO toUserResponseDTO(User user){
