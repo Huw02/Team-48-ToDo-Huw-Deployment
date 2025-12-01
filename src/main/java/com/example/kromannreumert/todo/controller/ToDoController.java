@@ -73,4 +73,15 @@ public class ToDoController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping("/todos/size")
+    public ResponseEntity<Integer> getToDoSize() {
+        try {
+            Integer toDoSize = toDoService.getToDoSize();
+            return ResponseEntity.ok(toDoSize);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+
+        }
+    }
 }

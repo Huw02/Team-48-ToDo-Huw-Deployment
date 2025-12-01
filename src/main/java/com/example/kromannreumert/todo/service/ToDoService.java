@@ -25,6 +25,11 @@ public class ToDoService {
         this.loggingService = loggingService;
     }
 
+    public int getToDoSize() {
+        List<ToDo> getAll = toDoRepository.findAll();
+        return getAll.size();
+    }
+
     public List<ToDoResponseDto> findAll(String name) {
         try {
             List<ToDo> toDos = toDoRepository.findAllByArchivedFalse();
