@@ -8,6 +8,9 @@ import com.example.kromannreumert.client.service.ClientService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
+
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/v1/client/")
@@ -22,55 +25,51 @@ public class ClientController {
 
 
     @GetMapping("")
-    public ResponseEntity<?> getAllClients() {
+    public ResponseEntity<?> getAllClients(Principal principal) {
         try {
-            return new ResponseEntity<>(clientService.getAllClients(), HttpStatus.OK);
-        } catch (RuntimeException e) {
+            return new ResponseEntity<>(clientService.getAllClients(principal.getName()), HttpStatus.OK);
+        } catch (HttpClientErrorException.NotFound e) {
             return new ResponseEntity<>("Could not fetch all clients: " + e.getMessage(), HttpStatus.NO_CONTENT);
         }
     }
 
     @GetMapping("/{idprefix}")
-    public ResponseEntity<?> getClientById(@PathVariable("idprefix") Long idprefix) {
-        try {
-            return new ResponseEntity<>(clientService.getClientByIdPrefix(idprefix), HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>("Client not found by id: " + idprefix, HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<?> getClientById(@PathVariable("idprefix") Long idprefix, Principal principal) {
+        return new ResponseEntity<>(clientService.getClientByIdPrefix(idprefix, principal.getName()), HttpStatus.OK);
     }
 
     // This endpoints needs to be removed or changed as there can contain spaces in a client name.
     @GetMapping("/getclientbyname/{clientName}")
-    public ResponseEntity<?> getClientByClientName(@PathVariable String clientName) {
+    public ResponseEntity<?> getClientByClientName(@PathVariable String clientName, Principal principal) {
         try {
-            return new ResponseEntity<>(clientService.getClientByName(clientName), HttpStatus.OK);
+            return new ResponseEntity<>(clientService.getClientByName(clientName, principal.getName()), HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>("Client not found by client name: " + clientName, HttpStatus.NOT_FOUND);
         }
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addClient(@RequestBody ClientRequestDTO clientRequestDTO) {
+    public ResponseEntity<?> addClient(@RequestBody ClientRequestDTO clientRequestDTO, Principal principal) {
         try {
-            return new ResponseEntity<>(clientService.addClient(clientRequestDTO), HttpStatus.CREATED);
+            return new ResponseEntity<>(clientService.addClient(clientRequestDTO, principal.getName()), HttpStatus.CREATED);
         } catch (RuntimeException e) {
             return new ResponseEntity<>("Failed to create the client: " + clientRequestDTO.clientName(), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PatchMapping("/update/id")
-    public ResponseEntity<?> updateClientIdPrefix(@RequestBody UpdateClientIdPrefixDTO clientIdPrefixDTO) {
+    public ResponseEntity<?> updateClientIdPrefix(@RequestBody UpdateClientIdPrefixDTO clientIdPrefixDTO, Principal principal) {
         try {
-            return new ResponseEntity<>(clientService.updateClientIdPrefix(clientIdPrefixDTO), HttpStatus.OK);
+            return new ResponseEntity<>(clientService.updateClientIdPrefix(clientIdPrefixDTO, principal.getName()), HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>("Failed to update the client: " + clientIdPrefixDTO.clientName(), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PatchMapping("/update/name")
-    public ResponseEntity<?> updateClientName(@RequestBody UpdateClientNameDTO clientNameDTO) {
+    public ResponseEntity<?> updateClientName(@RequestBody UpdateClientNameDTO clientNameDTO, Principal principal) {
         try {
-            return new ResponseEntity<>(clientService.updateClientName(clientNameDTO), HttpStatus.OK);
+            return new ResponseEntity<>(clientService.updateClientName(clientNameDTO, principal.getName()), HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>("Failed to update the client: " + clientNameDTO.oldName(), HttpStatus.BAD_REQUEST);
         }
@@ -78,34 +77,34 @@ public class ClientController {
 
 
    @PutMapping("/update/users")
-   public ResponseEntity<?> updateClientUsers(@RequestBody UpdateClientUserList clientUserList) {
+   public ResponseEntity<?> updateClientUsers(@RequestBody UpdateClientUserList clientUserList, Principal principal) {
        try {
-           return new ResponseEntity<>(clientService.updateClientUserList(clientUserList), HttpStatus.OK);
+           return new ResponseEntity<>(clientService.updateClientUserList(clientUserList, principal.getName()), HttpStatus.OK);
        } catch (RuntimeException e) {
            return new ResponseEntity<>("Failed to update the client: " + clientUserList, HttpStatus.BAD_REQUEST);
        }
    }
 
    @GetMapping("/user/{idprefix}")
-    public ResponseEntity<?> getUserByClient(@PathVariable Long idprefix) {
+    public ResponseEntity<?> getUserByClient(@PathVariable Long idprefix, Principal principal) {
         try {
-            return new ResponseEntity<>(clientService.getUserFromClient(idprefix), HttpStatus.OK);
+            return new ResponseEntity<>(clientService.getUserFromClient(idprefix, principal.getName()), HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>("Failed to retrieve the client user list", HttpStatus.NOT_FOUND);
         }
    }
 
    @GetMapping("/size")
-    public ResponseEntity<?> getClientSize() {
+    public ResponseEntity<?> getClientSize(Principal principal) {
        try {
-           return new ResponseEntity<>(clientService.getClientSize(), HttpStatus.OK);
+           return new ResponseEntity<>(clientService.getClientSize(principal.getName()), HttpStatus.OK);
        } catch (RuntimeException e) {
            return new ResponseEntity<>("Failed to retrieve the client user list", HttpStatus.NO_CONTENT);
        }
    }
 
    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteClient(@PathVariable Long id) {
-        return new ResponseEntity<>(clientService.deleteClient(id), HttpStatus.OK);
+    public ResponseEntity<?> deleteClient(@PathVariable Long id, Principal principal) {
+        return new ResponseEntity<>(clientService.deleteClient(id, principal.getName()), HttpStatus.OK);
    }
 }

@@ -37,6 +37,7 @@ public class KromannReumertApplication {
 
     private final PasswordEncoder passwordEncoder;
 
+    // test data
     @Bean
     @Profile("!test")
     CommandLineRunner loadTestData(UserRepository userRepo, RoleRepository roleRepository, ClientRepository clientRepository, CaseRepository caseRepository) {

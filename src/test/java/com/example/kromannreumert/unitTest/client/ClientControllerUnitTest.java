@@ -48,14 +48,14 @@ public class ClientControllerUnitTest {
     void should_returnAllClients_isOK_for_Admin() throws Exception {
         ClientResponeDTO dto = new ClientResponeDTO(1L, "TestClient", null, 1000L);
 
-        when(clientService.getAllClients()).thenReturn(Collections.singletonList(dto));
+        when(clientService.getAllClients(anyString())).thenReturn(Collections.singletonList(dto));
 
         mockMvc.perform(get(BASE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id").value(1))
                 .andExpect(jsonPath("$.[0].name").value("TestClient"));
 
-        verify(clientService).getAllClients();
+        verify(clientService).getAllClients(anyString());
     }
 
 
@@ -64,14 +64,14 @@ public class ClientControllerUnitTest {
     void should_returnAllClients_isOK_for_sagsbehandler() throws Exception {
         ClientResponeDTO dto = new ClientResponeDTO(1L, "TestClient", null, 1000L);
 
-        when(clientService.getAllClients()).thenReturn(Collections.singletonList(dto));
+        when(clientService.getAllClients(anyString())).thenReturn(Collections.singletonList(dto));
 
         mockMvc.perform(get(BASE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id").value(1))
                 .andExpect(jsonPath("$.[0].name").value("TestClient"));
 
-        verify(clientService).getAllClients();
+        verify(clientService).getAllClients(anyString());
     }
 
     @Test
@@ -79,7 +79,7 @@ public class ClientControllerUnitTest {
     void should_returnAllClients_isOK_for_partner() throws Exception {
         ClientResponeDTO dto = new ClientResponeDTO(1L, "TestClient", null, 1000L);
 
-        when(clientService.getAllClients()).thenReturn(Collections.singletonList(dto));
+        when(clientService.getAllClients(anyString())).thenReturn(Collections.singletonList(dto));
 
         mockMvc.perform(get(BASE))
                 .andExpect(status().isOk())
@@ -87,7 +87,7 @@ public class ClientControllerUnitTest {
                 .andExpect(jsonPath("$.[0].name").value("TestClient"));
 
 
-        verify(clientService).getAllClients();
+        verify(clientService).getAllClients(anyString());
     }
 
     @Test
@@ -95,7 +95,7 @@ public class ClientControllerUnitTest {
     void should_returnAllClients_isForbidden_for_jurist() throws Exception {
         mockMvc.perform(get(BASE))
                 .andExpect(status().isForbidden());
-        verify(clientService, never()).getAllClients();
+        verify(clientService, never()).getAllClients(anyString());
 
     }
 
@@ -103,7 +103,7 @@ public class ClientControllerUnitTest {
     void should_returnAllClients_isUnAuthorized_for_noOne() throws Exception {
         mockMvc.perform(get(BASE))
                 .andExpect(status().isUnauthorized());
-        verify(clientService, never()).getAllClients();
+        verify(clientService, never()).getAllClients(anyString());
 
     }
 
@@ -112,7 +112,7 @@ public class ClientControllerUnitTest {
     void should_returnOneClientWithId_isOK_for_Admin() throws Exception {
         ClientResponeDTO dto = new ClientResponeDTO(1L, "TestClient", null, 1000L);
 
-        when(clientService.getClientByIdPrefix(1000L))
+        when(clientService.getClientByIdPrefix(eq(1000L), anyString()))
                 .thenReturn(dto);
 
         mockMvc.perform(get(BASE + "/1000"))
@@ -120,7 +120,7 @@ public class ClientControllerUnitTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("TestClient"));
 
-        verify(clientService).getClientByIdPrefix(1000L);
+        verify(clientService).getClientByIdPrefix(eq(1000L), anyString());
     }
 
 
@@ -129,7 +129,7 @@ public class ClientControllerUnitTest {
     void should_returnOneClientWithId_isOK_for_sagsbehandler() throws Exception {
         ClientResponeDTO dto = new ClientResponeDTO(1L, "TestClient", null, 1000L);
 
-        when(clientService.getClientByIdPrefix(1000L))
+        when(clientService.getClientByIdPrefix(eq(1000L), anyString()))
                 .thenReturn(dto);
 
         mockMvc.perform(get(BASE + "/1000"))
@@ -137,7 +137,7 @@ public class ClientControllerUnitTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("TestClient"));
 
-        verify(clientService).getClientByIdPrefix(1000L);
+        verify(clientService).getClientByIdPrefix(eq(1000L), anyString());
     }
 
     @Test
@@ -145,7 +145,7 @@ public class ClientControllerUnitTest {
     void should_returnOneClientWithId_isOK_for_partner() throws Exception {
         ClientResponeDTO dto = new ClientResponeDTO(1L, "TestClient", null, 1000L);
 
-        when(clientService.getClientByIdPrefix(1000L))
+        when(clientService.getClientByIdPrefix(eq(1000L), anyString()))
                 .thenReturn(dto);
 
         mockMvc.perform(get(BASE + "/1000"))
@@ -153,7 +153,7 @@ public class ClientControllerUnitTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("TestClient"));
 
-        verify(clientService).getClientByIdPrefix(1000L);
+        verify(clientService).getClientByIdPrefix(eq(1000L), anyString());
     }
 
     @Test
@@ -161,14 +161,14 @@ public class ClientControllerUnitTest {
     void should_returnOneClientWithId_isForbidden_for_jurist() throws Exception {
         mockMvc.perform(get(BASE + "/1"))
                 .andExpect(status().isForbidden());
-        verify(clientService, never()).getClientByIdPrefix(1000L);
+        verify(clientService, never()).getClientByIdPrefix(anyLong(), anyString());
     }
 
     @Test
     void should_returnOneClientWithId_isUnAuthorized_for_noOne() throws Exception {
         mockMvc.perform(get(BASE + "/1"))
                 .andExpect(status().isUnauthorized());
-        verify(clientService, never()).getClientByIdPrefix(1000L);
+        verify(clientService, never()).getClientByIdPrefix(anyLong(), anyString());
     }
 
     @Test
@@ -176,7 +176,7 @@ public class ClientControllerUnitTest {
     void should_returnOneClientWithName_isOK_for_Admin() throws Exception {
         ClientResponeDTO dto = new ClientResponeDTO(1L, "TestClient", null, 1000L);
 
-        when(clientService.getClientByName("TestClient"))
+        when(clientService.getClientByName(eq("TestClient"), anyString()))
                 .thenReturn(dto);
 
         mockMvc.perform(get(BASE + "/getclientbyname/TestClient"))
@@ -184,7 +184,7 @@ public class ClientControllerUnitTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("TestClient"));
 
-        verify(clientService).getClientByName("TestClient");
+        verify(clientService).getClientByName(eq("TestClient"), anyString());
     }
 
 
@@ -193,7 +193,7 @@ public class ClientControllerUnitTest {
     void should_returnOneClientWithName_isOK_for_sagsbehandler() throws Exception {
         ClientResponeDTO dto = new ClientResponeDTO(1L, "TestClient", null, 1000L);
 
-        when(clientService.getClientByName("TestClient"))
+        when(clientService.getClientByName(eq("TestClient"), anyString()))
                 .thenReturn(dto);
 
         mockMvc.perform(get(BASE + "/getclientbyname/TestClient"))
@@ -201,7 +201,7 @@ public class ClientControllerUnitTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("TestClient"));
 
-        verify(clientService).getClientByName("TestClient");
+        verify(clientService).getClientByName(eq("TestClient"), anyString());
     }
 
     @Test
@@ -209,7 +209,7 @@ public class ClientControllerUnitTest {
     void should_returnOneClientWithName_isOK_for_partner() throws Exception {
         ClientResponeDTO dto = new ClientResponeDTO(1L, "TestClient", null, 1000L);
 
-        when(clientService.getClientByName("TestClient"))
+        when(clientService.getClientByName(eq("TestClient"), anyString()))
                 .thenReturn(dto);
 
         mockMvc.perform(get(BASE + "/getclientbyname/TestClient"))
@@ -217,7 +217,7 @@ public class ClientControllerUnitTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("TestClient"));
 
-        verify(clientService).getClientByName("TestClient");
+        verify(clientService).getClientByName(eq("TestClient"), anyString());
     }
 
     @Test
@@ -226,14 +226,14 @@ public class ClientControllerUnitTest {
         mockMvc.perform(get(BASE + "/getclientbyname/TestClient"))
                 .andExpect(status().isForbidden());
 
-        verify(clientService, never()).getClientByName("TestClient");
+        verify(clientService, never()).getClientByName(anyString(), anyString());
     }
 
     @Test
     void should_returnOneClientWithName_isUnAuthorized_for_noOne() throws Exception {
         mockMvc.perform(get(BASE + "/getclientbyname/TestClient"))
                 .andExpect(status().isUnauthorized());
-        verify(clientService, never()).getClientByName("TestClient");
+        verify(clientService, never()).getClientByName(anyString(), anyString());
 
     }
 
@@ -241,7 +241,7 @@ public class ClientControllerUnitTest {
     @WithMockUser(roles = "ADMIN")
     void should_return_addClient_successfully_for_admin() throws Exception {
         ClientRequestDTO test = new ClientRequestDTO("test", Set.of("hey"),1000L);
-        when(clientService.addClient(test)).thenReturn("Client successfully created: " + test.clientName());
+        when(clientService.addClient(eq(test), anyString())).thenReturn("Client successfully created: " + test.clientName());
 
         mockMvc.perform(MockMvcRequestBuilders.post(BASE +"/add")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -249,14 +249,14 @@ public class ClientControllerUnitTest {
                         .andExpect(status().isCreated())
                         .andExpect(jsonPath("$").value("Client successfully created: " + test.clientName()));
 
-        verify(clientService).addClient(test);
+        verify(clientService).addClient(eq(test), anyString());
     }
 
     @Test
     @WithMockUser(roles = "PARTNER")
     void should_return_addClient_successfully_for_partner() throws Exception {
         ClientRequestDTO test = new ClientRequestDTO("test", Set.of("hey"),1000L);
-        when(clientService.addClient(test)).thenReturn("Client successfully created: " + test.clientName());
+        when(clientService.addClient(eq(test), anyString())).thenReturn("Client successfully created: " + test.clientName());
 
         mockMvc.perform(MockMvcRequestBuilders.post(BASE +"/add")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -264,14 +264,14 @@ public class ClientControllerUnitTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$").value("Client successfully created: " + test.clientName()));
 
-        verify(clientService).addClient(test);
+        verify(clientService).addClient(eq(test), anyString());
     }
 
     @Test
     @WithMockUser(roles = "SAGSBEHANDLER")
     void should_return_addClient_successfully_for_sagsbehandler() throws Exception {
         ClientRequestDTO test = new ClientRequestDTO("test", Set.of("hey"),1000L);
-        when(clientService.addClient(test)).thenReturn("Client successfully created: " + test.clientName());
+        when(clientService.addClient(eq(test), anyString())).thenReturn("Client successfully created: " + test.clientName());
 
         mockMvc.perform(MockMvcRequestBuilders.post(BASE +"/add")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -279,91 +279,91 @@ public class ClientControllerUnitTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$").value("Client successfully created: " + test.clientName()));
 
-        verify(clientService).addClient(test);
+        verify(clientService).addClient(eq(test), anyString());
     }
 
     @Test
     @WithMockUser(roles = "JURIST")
     void should_return_addClient_forbidden_for_jurist() throws Exception {
         ClientRequestDTO test = new ClientRequestDTO("test", Set.of("hey"),1000L);
-        when(clientService.addClient(test)).thenReturn("Client successfully created: " + test.clientName());
+        when(clientService.addClient(eq(test), anyString())).thenReturn("Client successfully created: " + test.clientName());
 
         mockMvc.perform(MockMvcRequestBuilders.post(BASE +"/add")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(test)))
                 .andExpect(status().isForbidden());
 
-        verify(clientService, never()).addClient(test);
+        verify(clientService, never()).addClient(any(ClientRequestDTO.class), anyString());
 
     }
 
     @Test
     void should_return_addClient_unauthorized_for_noRole() throws Exception {
         ClientRequestDTO test = new ClientRequestDTO("test", Set.of("hey"),1000L);
-        when(clientService.addClient(test)).thenReturn("Client successfully created: " + test.clientName());
+        when(clientService.addClient(eq(test), anyString())).thenReturn("Client successfully created: " + test.clientName());
 
         mockMvc.perform(MockMvcRequestBuilders.post(BASE +"/add")
                         .contentType(MediaType.APPLICATION_JSON))
                         .andExpect(status().isUnauthorized());
-        verify(clientService, never()).addClient(test);
+        verify(clientService, never()).addClient(any(ClientRequestDTO.class), anyString());
 
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
     void should_return_deleted_client_IsOK_for_Admin() throws Exception {
-        when(clientService.deleteClient(100L)).thenReturn("Client with id: 100L has been deleted");
+        when(clientService.deleteClient(eq(100L), anyString())).thenReturn("Client with id: 100L has been deleted");
 
         mockMvc.perform(delete(BASE + "/delete/100"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").value("Client with id: 100L has been deleted"));
 
-        verify(clientService).deleteClient(100L);
+        verify(clientService).deleteClient(eq(100L), anyString());
     }
 
     @Test
     @WithMockUser(roles = "SAGSBEHANDLER")
     void should_return_deleted_client_IsOK_for_sagsbehandler() throws Exception {
-        when(clientService.deleteClient(100L)).thenReturn("Client with id: 100L has been deleted");
+        when(clientService.deleteClient(eq(100L), anyString())).thenReturn("Client with id: 100L has been deleted");
 
         mockMvc.perform(delete(BASE + "/delete/100"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").value("Client with id: 100L has been deleted"));
 
-        verify(clientService).deleteClient(100L);
+        verify(clientService).deleteClient(eq(100L), anyString());
     }
 
     @Test
     @WithMockUser(roles = "PARTNER")
     void should_return_deleted_client_IsOK_for_partner() throws Exception {
-        when(clientService.deleteClient(100L)).thenReturn("Client with id: 100L has been deleted");
+        when(clientService.deleteClient(eq(100L), anyString())).thenReturn("Client with id: 100L has been deleted");
 
         mockMvc.perform(delete(BASE + "/delete/100"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").value("Client with id: 100L has been deleted"));
 
-        verify(clientService).deleteClient(100L);
+        verify(clientService).deleteClient(eq(100L), anyString());
     }
 
     @Test
     @WithMockUser(roles = "JURIST")
     void should_return_deleted_client_IsForbidden_for_Admin() throws Exception {
-        when(clientService.deleteClient(100L)).thenReturn("Client with id: 100L has been deleted");
+        when(clientService.deleteClient(eq(100L), anyString())).thenReturn("Client with id: 100L has been deleted");
 
         mockMvc.perform(delete(BASE + "/delete/100"))
                 .andExpect(status().isForbidden());
 
-        verify(clientService, never()).deleteClient(100L);
+        verify(clientService, never()).deleteClient(anyLong(), anyString());
     }
 
     @Test
     void should_return_deleted_client_IsUnAuthorized_for_noUser() throws Exception {
-        when(clientService.deleteClient(100L)).thenReturn("Client with id: 100L has been deleted");
+        when(clientService.deleteClient(eq(100L), anyString())).thenReturn("Client with id: 100L has been deleted");
 
         mockMvc.perform(delete(BASE + "/delete/100"))
                 .andExpect(status().isUnauthorized());
 
-        verify(clientService, never()).deleteClient(100L);
+        verify(clientService, never()).deleteClient(anyLong(), anyString());
     }
 
     @Test
@@ -373,7 +373,7 @@ public class ClientControllerUnitTest {
         UpdateClientIdPrefixDTO dto =
                 new UpdateClientIdPrefixDTO("ClientA", 9000L);
 
-        when(clientService.updateClientIdPrefix(dto))
+        when(clientService.updateClientIdPrefix(eq(dto), anyString()))
                 .thenReturn("Updated ID prefix");
 
         mockMvc.perform(
@@ -384,7 +384,7 @@ public class ClientControllerUnitTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").value("Updated ID prefix"));
 
-        verify(clientService).updateClientIdPrefix(dto);
+        verify(clientService).updateClientIdPrefix(eq(dto), anyString());
     }
 
     @Test
@@ -394,7 +394,7 @@ public class ClientControllerUnitTest {
         UpdateClientNameDTO dto =
                 new UpdateClientNameDTO("OldName", "NewName");
 
-        when(clientService.updateClientName(dto))
+        when(clientService.updateClientName(eq(dto), anyString()))
                 .thenReturn("Updated client name");
 
         mockMvc.perform(
@@ -405,7 +405,7 @@ public class ClientControllerUnitTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").value("Updated client name"));
 
-        verify(clientService).updateClientName(dto);
+        verify(clientService).updateClientName(eq(dto), anyString());
     }
 
     // ALL TEST DONE
@@ -416,7 +416,7 @@ public class ClientControllerUnitTest {
         UpdateClientUserList dto =
                 new UpdateClientUserList(9000L, Set.of("User1", "User2"));
 
-        when(clientService.updateClientUserList(dto))
+        when(clientService.updateClientUserList(eq(dto), anyString()))
                 .thenReturn("Updated user list");
 
         mockMvc.perform(
@@ -427,7 +427,7 @@ public class ClientControllerUnitTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").value("Updated user list"));
 
-        verify(clientService).updateClientUserList(dto);
+        verify(clientService).updateClientUserList(eq(dto), anyString());
     }
 
     @Test
@@ -437,7 +437,7 @@ public class ClientControllerUnitTest {
         UpdateClientUserList dto =
                 new UpdateClientUserList(9000L, Set.of("User1", "User2"));
 
-        when(clientService.updateClientUserList(dto))
+        when(clientService.updateClientUserList(eq(dto), anyString()))
                 .thenReturn("Updated user list");
 
         mockMvc.perform(
@@ -448,7 +448,7 @@ public class ClientControllerUnitTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").value("Updated user list"));
 
-        verify(clientService).updateClientUserList(dto);
+        verify(clientService).updateClientUserList(eq(dto), anyString());
     }
 
     @Test
@@ -458,7 +458,7 @@ public class ClientControllerUnitTest {
         UpdateClientUserList dto =
                 new UpdateClientUserList(9000L, Set.of("User1", "User2"));
 
-        when(clientService.updateClientUserList(dto))
+        when(clientService.updateClientUserList(eq(dto), anyString()))
                 .thenReturn("Updated user list");
 
         mockMvc.perform(
@@ -469,7 +469,7 @@ public class ClientControllerUnitTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").value("Updated user list"));
 
-        verify(clientService).updateClientUserList(dto);
+        verify(clientService).updateClientUserList(eq(dto), anyString());
     }
 
     @Test
@@ -479,7 +479,7 @@ public class ClientControllerUnitTest {
         UpdateClientUserList dto =
                 new UpdateClientUserList(9000L, Set.of("User1", "User2"));
 
-        when(clientService.updateClientUserList(dto))
+        when(clientService.updateClientUserList(eq(dto), anyString()))
                 .thenReturn("Updated user list");
 
         mockMvc.perform(
@@ -488,7 +488,6 @@ public class ClientControllerUnitTest {
                                 .content(objectMapper.writeValueAsString(dto))
                 )
                 .andExpect(status().isForbidden());
-        verify(clientService, never()).updateClientUserList(dto);
+        verify(clientService, never()).updateClientUserList(any(UpdateClientUserList.class), anyString());
     }
 }
-

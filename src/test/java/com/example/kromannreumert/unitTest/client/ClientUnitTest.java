@@ -8,6 +8,8 @@ import com.example.kromannreumert.client.entity.Client;
 import com.example.kromannreumert.client.mapper.ClientMapper;
 import com.example.kromannreumert.client.repository.ClientRepository;
 import com.example.kromannreumert.client.service.ClientService;
+import com.example.kromannreumert.logging.entity.LogAction;
+import com.example.kromannreumert.logging.service.LoggingService;
 import com.example.kromannreumert.user.entity.Role;
 import com.example.kromannreumert.user.entity.User;
 import com.example.kromannreumert.user.repository.UserRepository;
@@ -38,6 +40,8 @@ public class ClientUnitTest {
     @Mock
     UserRepository userRepository;
 
+    @Mock
+    LoggingService loggingService;
 
     @InjectMocks
     ClientService clientService;
@@ -56,7 +60,7 @@ public class ClientUnitTest {
         when(clientMapper.toClientDTO(createClient)).thenReturn(convert);
 
         // ACT
-        List<ClientResponeDTO> result = clientService.getAllClients();
+        List<ClientResponeDTO> result = clientService.getAllClients("Abdi");
 
         // ASSERT
         assertNotNull(result);
@@ -66,6 +70,7 @@ public class ClientUnitTest {
         assertEquals(createClient.getIDPrefix(), result.getFirst().idPrefix());
         verify(clientRepository).findAll();
         verify(clientMapper).toClientDTO(createClient);
+        verify(loggingService).log(eq(LogAction.VIEW_ALL_CLIENTS), eq("Abdi"), contains("fetched all clients successfully"));
 
     }
 
@@ -85,7 +90,7 @@ public class ClientUnitTest {
         // ACT
         when(clientRepository.getClientByIDPrefix(1000L)).thenReturn(Optional.of(createClient));
         when(clientMapper.toClientDTO(createClient)).thenReturn(convertClient);
-        ClientResponeDTO result = clientService.getClientByIdPrefix(1000L);
+        ClientResponeDTO result = clientService.getClientByIdPrefix(1000L, "Tester");
 
         // ASSERT
         assertNotNull(result);
@@ -93,6 +98,7 @@ public class ClientUnitTest {
         assertEquals(createClient.getIDPrefix(), result.idPrefix());
         verify(clientRepository).getClientByIDPrefix(idPrefix);
         verify(clientMapper).toClientDTO(createClient);
+        verify(loggingService).log(eq(LogAction.VIEW_ONE_CLIENT), eq("Tester"), contains("id prefix"));
     }
 
     @Test
@@ -108,7 +114,7 @@ public class ClientUnitTest {
         when(clientMapper.toClientDTO(createClient)).thenReturn(convertClient);
 
         // ACT
-        ClientResponeDTO result = clientService.getClientByName("ClientTestName");
+        ClientResponeDTO result = clientService.getClientByName("ClientTestName", "Tester");
 
         // ASSERT
         assertNotNull(result);
@@ -117,6 +123,7 @@ public class ClientUnitTest {
         assertEquals(createClient.getId(), result.id());
         verify(clientRepository).findClientByName("ClientTestName");
         verify(clientMapper).toClientDTO(createClient);
+        verify(loggingService).log(eq(LogAction.VIEW_ONE_CLIENT), eq("Tester"), contains("ClientTestName"));
     }
 
     @Test
@@ -139,7 +146,7 @@ public class ClientUnitTest {
         when(userRepository.findByUsername("TestUser")).thenReturn(Optional.of(createUser));
 
         // ACT
-        String result = clientService.addClient(createClient);
+        String result = clientService.addClient(createClient, "Creator");
         String expectedResult = "Client successfully created: " + createClient.clientName();
 
 
@@ -148,6 +155,7 @@ public class ClientUnitTest {
         assertEquals(result, expectedResult);
         verify(clientRepository).save(any(Client.class));
         verify(userRepository).findByUsername("TestUser");
+        verify(loggingService).log(eq(LogAction.CREATE_CLIENT), eq("Creator"), contains(createClient.clientName()));
 
     }
 
@@ -163,7 +171,7 @@ public class ClientUnitTest {
         when(clientRepository.save(any(Client.class))).thenReturn(updatedClient);
 
         // ACT
-        String result = clientService.updateClientName(updateName);
+        String result = clientService.updateClientName(updateName, "Updater");
         ArgumentCaptor<Client> newNameCaptor = ArgumentCaptor.forClass(Client.class);
         verify(clientRepository).save(newNameCaptor.capture());
         String expectedName = newNameCaptor.getValue().getName();
@@ -175,6 +183,7 @@ public class ClientUnitTest {
         assertNotEquals(expectedName, updateName.oldName());
         verify(clientRepository).findClientByName(updateName.oldName());
         verify(clientRepository).save(any(Client.class));
+        verify(loggingService).log(eq(LogAction.UPDATE_CLIENT), eq("Updater"), contains(expectedName));
 
     }
 
@@ -193,7 +202,7 @@ public class ClientUnitTest {
         when(clientRepository.save(any(Client.class))).thenReturn(updatedClient);
 
         // ACT
-        String result = clientService.updateClientIdPrefix(updateID);
+        String result = clientService.updateClientIdPrefix(updateID, "Updater");
 
 
         // ASSERT
@@ -202,6 +211,7 @@ public class ClientUnitTest {
         assertEquals(result, "Successfully updated client with: " + updateID.idPrefix());
         verify(clientRepository).findClientByName(clientName);
         verify(clientRepository).save(any(Client.class));
+        verify(loggingService).log(eq(LogAction.UPDATE_CLIENT), eq("Updater"), contains(clientName));
     }
 
     @Test
@@ -224,10 +234,11 @@ public class ClientUnitTest {
         String expectedResult = "Client with id: " + id + " has been deleted";
 
         // ASSERT
-        String result = clientService.deleteClient(id);
+        String result = clientService.deleteClient(id, "Remover");
         assertNotNull(result);
         assertEquals(result, expectedResult);
         verify(clientRepository).deleteById(id);
+        verify(loggingService).log(eq(LogAction.DELETE_CLIENT), eq("Remover"), contains(id.toString()));
     }
 
 

@@ -55,6 +55,5 @@ public class AuthorizeController {
             log.error("Could not create user {}", user.getName());
             return new ResponseEntity<>("Could not create user",HttpStatus.BAD_REQUEST);
         }
-
     }
 }
