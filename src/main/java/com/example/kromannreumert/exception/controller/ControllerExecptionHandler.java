@@ -2,6 +2,7 @@ package com.example.kromannreumert.exception.controller;
 
 
 import com.example.kromannreumert.exception.customException.ClientNotFoundException;
+import com.example.kromannreumert.exception.customException.ForbiddenException;
 import com.example.kromannreumert.exception.customException.NotFoundException;
 import com.example.kromannreumert.exception.entity.ErrorMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,12 @@ public class ControllerExecptionHandler {
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorMessage> handleNotFound(NotFoundException ex, WebRequest req) {
         return buildResponse(404, ex, req);
+    }
+
+    // Change forbidden exception to Unauthorized
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ErrorMessage> forbiddenAccess(ForbiddenException ex, WebRequest req) {
+        return buildResponse(403, ex, req);
     }
 
     private ResponseEntity<ErrorMessage> buildResponse(int status, Exception ex, WebRequest req) {
