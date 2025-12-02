@@ -1,6 +1,6 @@
 package com.example.kromannreumert.security.controller;
 
-import com.example.kromannreumert.exception.customException.UserUnauthorized;
+import com.example.kromannreumert.exception.customException.UserUnauthorizedException;
 import com.example.kromannreumert.security.dto.JwtResponseDTO;
 import com.example.kromannreumert.security.dto.LoginDTO;
 import com.example.kromannreumert.user.entity.User;
@@ -39,7 +39,7 @@ public class AuthorizeController {
         } catch (Exception e) {
             log.error("Controller: It was not possible to sign the user in {}", loginRequest.username());
             log.error("Login failed due to: {}", e.getMessage());
-            throw new UserUnauthorized();
+            throw new UserUnauthorizedException();
         }
     }
 

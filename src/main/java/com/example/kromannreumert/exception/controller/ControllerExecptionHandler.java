@@ -31,11 +31,25 @@ public class ControllerExecptionHandler {
 
      */
 
+    /**
+     * Method used to handle not found elements from the database
+     * @param ex is the customized parameter in the exception handler that returns "Client/User/Case/To-do" not found and the id
+     * @param req is the endpoint that has been accessed
+     * @return customized exception object that returns HTTP status code, customized exception text and the endpoint visited
+     */
+
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorMessage> handleNotFound(NotFoundException ex, WebRequest req) {
         return buildResponse(404, ex, req);
     }
 
+    /**
+     * Method used to handle user not authorized when trying to log in
+     * @param ex is the customized parameter in the exception handler (Invalid user credentials)
+     * @param req is the endpoint that has been accessed
+     * @return customized exception object that returns HTTP status code, customized exception text and the endpoint visited
+     */
+    
     // Change forbidden exception to Unauthorized
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ErrorMessage> unAuthorized(UnauthorizedException ex, WebRequest req) {
