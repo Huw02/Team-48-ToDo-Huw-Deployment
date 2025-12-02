@@ -38,6 +38,7 @@ public class AuthorizeController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("Controller: It was not possible to sign the user in {}", loginRequest.username());
+            log.error("Login failed due to: {}", e.getMessage());
             throw new UserUnauthorized();
         }
     }
