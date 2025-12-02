@@ -26,25 +26,23 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/auth/**",
-                                "/status/healthz",
-                                "/h2-console/**")
-                        .permitAll()
+                        .requestMatchers("/auth/**", "/status/healthz", "/h2-console/**").permitAll()
 
-                        .requestMatchers("/api/v1/client/**").hasAnyRole("ADMIN", "PARTNER", "SAGSBEHANDLER") // <--- 2) This
-                        .requestMatchers("/api/v1/cases/**").hasAnyRole("PARTNER", "SAGSBEHANDLER")
+                        // GET endpoints
+                        .requestMatchers(HttpMethod.GET, "/api/v1/cases/**").hasAnyRole("ADMIN", "PARTNER", "SAGSBEHANDLER", "JURIST")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/client/**").hasAnyRole("ADMIN", "PARTNER", "SAGSBEHANDLER")
+
+                        // POST/PUT/DELETE for cases
+                        .requestMatchers("/api/v1/cases/**").hasAnyRole("ADMIN", "PARTNER", "SAGSBEHANDLER")
+                        .requestMatchers("/api/v1/client/**").hasAnyRole("ADMIN", "PARTNER", "SAGSBEHANDLER")
+
+                        // Other endpoints
                         .requestMatchers("/api/v1/todos/**").hasAnyRole("ADMIN", "PARTNER", "SAGSBEHANDLER", "JURIST")
                         .requestMatchers("/api/v1/role/**", "/api/v1/user/**").hasRole("ADMIN")
 
-                        // Had to change the order for it to work dont know why
+                        .anyRequest().authenticated()
+                )
 
-                        .requestMatchers(HttpMethod.GET, "/api/v1/client/**").hasRole("SAGSBEHANDLER")
-                        .requestMatchers(HttpMethod.GET, "/api/v1/cases/**").hasRole("JURIST")
-
-                        .requestMatchers("/api/v1/**").hasRole("ADMIN") // <--- 1) This doesn't work without
-
-                        .anyRequest().authenticated())
 
 
                 .oauth2ResourceServer(

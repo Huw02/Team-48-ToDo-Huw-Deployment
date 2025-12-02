@@ -9,7 +9,7 @@ public class CaseMapper {
 
 
     public CaseResponseDTO caseToResponse(Casee casee) {
-        return new CaseResponseDTO(casee.getName(), casee.getClient(), casee.getUsers(), casee.getIdPrefix());
+        return new CaseResponseDTO(casee.getName(), casee.getClient(), casee.getUsers(), casee.getIdPrefix(), casee.getResponsibleUser());
     }
 
 }

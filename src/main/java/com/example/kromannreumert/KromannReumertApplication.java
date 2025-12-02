@@ -71,7 +71,11 @@ public class KromannReumertApplication {
                 Client caseClient = clientRepository.findById(Long.valueOf(1))
                                 .orElseThrow(() -> new EntityNotFoundException("Client not found"));
                 Set<User> caseUsers = new HashSet<>();
-                caseRepository.save(new Casee("Ossas-Sagen", caseClient, caseUsers, 10455L));
+                caseUsers.add(userRepo.findById(5)
+                        .orElseThrow(() -> new RuntimeException("User not found")));
+
+                caseRepository.save(new Casee("Ossas-Sagen", caseClient, caseUsers, 10455L, user));
+                caseRepository.save(new Casee("Sagen om Simon", caseClient, new HashSet<>(), 10696L, user));
 
 
 

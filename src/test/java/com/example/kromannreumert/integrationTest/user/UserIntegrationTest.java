@@ -55,7 +55,7 @@ public class UserIntegrationTest {
                 .andExpect(jsonPath("$[0].role.id").value(1))
                 .andExpect(jsonPath("$[0].role.roleName").value("ADMIN"))
 
-                .andExpect(jsonPath("$.size()").value(3));
+                .andExpect(jsonPath("$.size()").value(4));
     }
 
     @Test

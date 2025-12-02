@@ -5,5 +5,5 @@ import com.example.kromannreumert.user.entity.User;
 
 import java.util.Set;
 
-public record CaseResponseDTO(String name, Client client, Set<User> users, Long idPrefix) {
+public record CaseResponseDTO(String name, Client client, Set<User> users, Long idPrefix, User responsibleUser) {
 }
