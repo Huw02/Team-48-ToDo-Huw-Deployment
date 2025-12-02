@@ -25,9 +25,10 @@ INSERT INTO casee ( name, client_id, id_prefix) VALUES
         ( 'Contract Review', 1, 1100),
         ( 'System Rollout', 2, 2200);
 
-INSERT INTO to_do ( description, case_id, start_date, end_date, archived, priority, status) VALUES
-          ( 'Draft NDA', 1, '2024-02-01', '2024-02-05', FALSE, 'HIGH', 'OPEN'),
-        ( 'Prepare implementation plan', 2, '2024-02-10', NULL, FALSE, 'MEDIUM', 'IN_PROGRESS');
+INSERT INTO to_do ( name, description, case_id, created, start_date, end_date, archived, priority, status) VALUES
+        ('NDA', 'Draft NDA', 1,'2024-01-15 10:00:00', '2024-02-01', '2024-02-05', FALSE, 'HIGH', 'NOT_STARTED'),
+        ('Implementation plan','Prepare implementation plan', 2, '2024-01-20 11:00:00', '2024-02-10', '2024-02-15', FALSE, 'MEDIUM', 'IN_PROGRESS'),
+        ('Old task - archived','This task was completed earlier', 1, '2023-12-01 09:00:00', '2023-12-05', '2023-12-07', TRUE, 'LOW', 'DONE');
 
 INSERT INTO logging (actor, action, details, timestamp) VALUES
         ( 'admin', 'CREATE_CLIENT', 'Created client Kromann Reumert', '2024-02-01 09:00:00'),

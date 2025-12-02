@@ -28,18 +28,21 @@ CREATE TABLE casee (
                       id BIGINT AUTO_INCREMENT PRIMARY KEY,
                       name VARCHAR(255) NOT NULL,
                       client_id BIGINT NOT NULL,
-                      id_prefix BIGINT
+                      id_prefix BIGINT,
+                      responsible_user_id BIGINT
 );
 
 CREATE TABLE to_do (
-                      id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                      description VARCHAR(255) NOT NULL,
-                      case_id BIGINT NOT NULL,
-                      start_date DATE NOT NULL,
-                      end_date DATE,
-                      archived BOOL,
-                      priority VARCHAR(255),
-                      status VARCHAR(255)
+                       id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                       name VARCHAR(255) NOT NULL,
+                       description VARCHAR(255) NOT NULL,
+                       case_id BIGINT,
+                       created TIMESTAMP,
+                       start_date DATE NOT NULL,
+                       end_date DATE,
+                       archived BOOLEAN,
+                       priority VARCHAR(50),
+                       status VARCHAR(50)
 );
 
 CREATE TABLE logging (

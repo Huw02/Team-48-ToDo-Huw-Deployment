@@ -30,6 +30,7 @@ public class ToDo {
     private String description;
 
     @ManyToOne
+    @JoinColumn(name = "case_id")
     private Casee caseId;
 
     private LocalDateTime created;
