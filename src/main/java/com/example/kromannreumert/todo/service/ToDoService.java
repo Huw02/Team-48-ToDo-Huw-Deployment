@@ -8,9 +8,15 @@ import com.example.kromannreumert.todo.dto.ToDoResponseDto;
 import com.example.kromannreumert.todo.entity.ToDo;
 import com.example.kromannreumert.todo.mapper.ToDoMapper;
 import com.example.kromannreumert.todo.repository.ToDoRepository;
+import com.example.kromannreumert.user.entity.Role;
+import com.example.kromannreumert.user.entity.User;
+import com.example.kromannreumert.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+
+import static org.springframework.security.authorization.AuthorityReactiveAuthorizationManager.hasRole;
 
 @Service
 public class ToDoService {
@@ -18,11 +24,13 @@ public class ToDoService {
     private final ToDoRepository toDoRepository;
     private final ToDoMapper toDoMapper;
     private final LoggingService loggingService;
+    private final UserRepository userRepository;
 
-    public ToDoService(ToDoRepository toDoRepository, ToDoMapper toDoMapper, LoggingService loggingService) {
+    public ToDoService(ToDoRepository toDoRepository, ToDoMapper toDoMapper, LoggingService loggingService, UserRepository userRepository) {
         this.toDoRepository = toDoRepository;
         this.toDoMapper = toDoMapper;
         this.loggingService = loggingService;
+        this.userRepository = userRepository;
     }
 
     public int getToDoSize() {
@@ -30,23 +38,42 @@ public class ToDoService {
         return getAll.size();
     }
 
-    public List<ToDoResponseDto> findAll(String name) {
+    public List<ToDoResponseDto> findAll(String username) {
         try {
-            List<ToDo> toDos = toDoRepository.findAllByArchivedFalse();
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found: " + username));
+
+            Set<Role> roles = user.getRoles();
+
+            boolean isJurist = hasRole(roles, "JURIST");
+            boolean isSagsbehandler = hasRole(roles, "SAGSBEHANDLER");
+            boolean isPartner = hasRole(roles, "PARTNER");
+            boolean isAdmin = hasRole(roles, "ADMIN");
+
+            List<ToDo> toDos;
+
+            if (isJurist && !isSagsbehandler && !isPartner && !isAdmin) {
+                toDos = toDoRepository.findDistinctByCaseId_Users_UsernameAndArchivedFalse(username);
+            } else {
+                toDos = toDoRepository.findAllByArchivedFalse();
+            }
 
             List<ToDoResponseDto> responseDtos = toDos.stream()
                     .map(toDoMapper::toToDoResponseDto)
                     .toList();
 
-            loggingService.log(LogAction.VIEW_ALL_TODOS, name, "Viewed all todos");
+            loggingService.log(LogAction.VIEW_ALL_TODOS, username, "Viewed todos");
 
             return responseDtos;
         } catch (Exception e) {
-            loggingService.log(LogAction.VIEW_ALL_TODOS_FAILED, name, "Failed to view all todos");
-
+            loggingService.log(LogAction.VIEW_ALL_TODOS_FAILED, username, "Failed to view todos");
             throw new RuntimeException("Failed fetching todos", e);
         }
+    }
 
+    private boolean hasRole(Set<Role> roles, String roleName) {
+        return roles.stream()
+                .anyMatch(role -> role.getRoleName().equalsIgnoreCase(roleName));
     }
 
     public ToDoResponseDto findToDoById(String name, Long id) {
@@ -83,7 +110,7 @@ public class ToDoService {
     public void deleteTodo(String name, Long id) {
         try {
             ToDo toDo = toDoRepository.findById(id)
-                            .orElseThrow(() -> new RuntimeException("Could not find todo with id: " + id));
+                    .orElseThrow(() -> new RuntimeException("Could not find todo with id: " + id));
 
             toDoRepository.delete(toDo);
 
@@ -116,6 +143,23 @@ public class ToDoService {
         } catch (Exception e) {
             loggingService.log(LogAction.UPDATE_TODO_FAILED, name, "Failed to update todo: " + todoRequestDto.name() + " " + e.getMessage());
             throw new RuntimeException("Could not update todo: " + todoRequestDto.name(), e);
+        }
+    }
+
+    public List<ToDoResponseDto> findAssignedToUser(String username) {
+        try {
+            List<ToDo> toDos = toDoRepository.findDistinctByUsers_UsernameAndArchivedFalse(username);
+
+            List<ToDoResponseDto> responseDtos = toDos.stream()
+                    .map(toDoMapper::toToDoResponseDto)
+                    .toList();
+
+            loggingService.log(LogAction.VIEW_ALL_TODOS, username, "Viewed todos assigned to user");
+
+            return responseDtos;
+        } catch (Exception e) {
+            loggingService.log(LogAction.VIEW_ALL_TODOS_FAILED, username, "Failed to view todos assigned to user");
+            throw new RuntimeException("Failed fetching assigned todos", e);
         }
     }
 }

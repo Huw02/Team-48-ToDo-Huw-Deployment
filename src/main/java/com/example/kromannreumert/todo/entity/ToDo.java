@@ -50,8 +50,8 @@ public class ToDo {
     @ManyToMany
     @JoinTable(
             name = "todo_assignee",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "todo_id")
+            joinColumns = @JoinColumn(name = "todo_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private Set<User> users;
 

@@ -68,7 +68,7 @@ CREATE TABLE case_assignee (
 );
 
 CREATE TABLE todo_assignee (
-                               user_id BIGINT NOT NULL,
                                todo_id BIGINT NOT NULL,
-                               PRIMARY KEY (user_id, todo_id)
+                               user_id BIGINT NOT NULL,
+                               PRIMARY KEY (todo_id,user_id)
 );

@@ -35,10 +35,10 @@ public class ToDoIntegrationTest {
     private ObjectMapper objectMapper;
 
     @Test
-    @WithMockUser(username = "jurist", roles = "JURIST")
+    @WithMockUser(username = "admin", roles = "ADMIN")
     void findAllNotArchivedToDos() throws Exception {
         mockMvc.perform(get("/api/v1/todos")
-                .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].archived").value(false))
@@ -46,10 +46,10 @@ public class ToDoIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "jurist", roles = "JURIST")
+    @WithMockUser(username = "admin", roles = "ADMIN")
     void findToDoById() throws Exception {
-        mockMvc.perform(get("/api/v1/todos/{id}",1)
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/v1/todos/{id}", 1)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("NDA"))
@@ -63,13 +63,13 @@ public class ToDoIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "jurist", roles = "JURIST")
+    @WithMockUser(username = "admin", roles = "ADMIN")
     void createToDo() throws Exception {
         ToDoRequestNewToDoDto requestDto = new ToDoRequestNewToDoDto(
                 "test",
                 "dette er en test",
-                LocalDate.of(2025,12,1),
-                LocalDate.of(2025,12,2),
+                LocalDate.of(2025, 12, 1),
+                LocalDate.of(2025, 12, 2),
                 Priority.MEDIUM
         );
 
@@ -92,8 +92,8 @@ public class ToDoIntegrationTest {
         String responseJson = result.getResponse().getContentAsString();
         Long id = objectMapper.readTree(responseJson).get("id").asLong();
 
-        mockMvc.perform(get("/api/v1/todos/{id}",id)
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/api/v1/todos/{id}", id)
+                        .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id))
                 .andExpect(jsonPath("$.name").value("test"))
@@ -103,14 +103,14 @@ public class ToDoIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "jurist", roles = "JURIST")
+    @WithMockUser(username = "admin", roles = "ADMIN")
     void getTodo_returnsNotFoundForUnknownId() throws Exception {
         mockMvc.perform(get("/api/v1/todos/{id}", 9999))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    @WithMockUser(username = "jurist", roles = "JURIST")
+    @WithMockUser(username = "admin", roles = "ADMIN")
     void deleteToDo() throws Exception {
         mockMvc.perform(delete("/api/v1/todos/{id}", 1))
                 .andExpect(status().isNoContent());
@@ -121,14 +121,14 @@ public class ToDoIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "jurist", roles = "JURIST")
+    @WithMockUser(username = "admin", roles = "ADMIN")
     void deleteToDo_nonExistingId_returnsNotFound() throws Exception {
         mockMvc.perform(delete("/api/v1/todos/{id}", 9999))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    @WithMockUser(username = "jurist", roles = "JURIST")
+    @WithMockUser(username = "admin", roles = "ADMIN")
     void updateToDo_existingId() throws Exception {
         ToDoRequestDto updateDto = new ToDoRequestDto(
                 "Opdateret titel",
@@ -158,7 +158,7 @@ public class ToDoIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "jurist", roles = "JURIST")
+    @WithMockUser(username = "admin", roles = "ADMIN")
     void updateToDo_nonExistingId() throws Exception {
         ToDoRequestDto updateDto = new ToDoRequestDto(
                 "Ingen betydning",
@@ -180,10 +180,45 @@ public class ToDoIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "jurist", roles = "JURIST")
+    @WithMockUser(username = "admin", roles = "ADMIN")
     void getToDoSize_returnsNumberOfTodosFromDatabase() throws Exception {
         mockMvc.perform(get("/api/v1/todos/size"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("3"));
+    }
+
+    @Test
+    @WithMockUser(username = "worker01", roles = "SAGSBEHANDLER")
+    void findAssignedTodos_returnsTodosForLoggedInUser() throws Exception {
+        mockMvc.perform(get("/api/v1/todos/assigned")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].archived").value(false));
+    }
+
+    @Test
+    @WithMockUser(username = "jurist01", roles = "JURIST")
+    void findAll_asJurist_returnsOnlyTodosFromAssignedCases() throws Exception {
+        mockMvc.perform(get("/api/v1/todos")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].name").value("NDA"))
+                .andExpect(jsonPath("$[0].archived").value(false));
+    }
+
+    @Test
+    @WithMockUser(username = "jurist01", roles = "JURIST")
+    void findAssignedTodos_asJurist_returnsTodosWhereJuristIsAssignee() throws Exception {
+        mockMvc.perform(get("/api/v1/todos/assigned")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].name").value("NDA"))
+                .andExpect(jsonPath("$[0].archived").value(false));
     }
 }

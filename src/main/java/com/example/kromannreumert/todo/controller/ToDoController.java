@@ -33,6 +33,16 @@ public class ToDoController {
         }
     }
 
+    @GetMapping("/todos/assigned")
+    public ResponseEntity<List<ToDoResponseDto>> findAssigned(Principal principal) {
+        try {
+            List<ToDoResponseDto> responseDtos = toDoService.findAssignedToUser(principal.getName());
+            return ResponseEntity.ok(responseDtos);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @GetMapping("/todos/{id}")
     public ResponseEntity<ToDoResponseDto> findById(@PathVariable Long id, Principal principal) {
         try {

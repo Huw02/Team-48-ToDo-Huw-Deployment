@@ -55,7 +55,7 @@ public class RoleUnitTestController {
         mockMvc.perform(get(baseURL))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.[0].id").value(1))
-                .andExpect(jsonPath("$[0].role").value("ADMIN"));
+                .andExpect(jsonPath("$[0].roleName").value("ADMIN"));
     }
 
     @Test
@@ -96,7 +96,7 @@ public class RoleUnitTestController {
         mockMvc.perform(get(baseURL + "/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.role").value("ADMIN"));
+                .andExpect(jsonPath("$.roleName").value("ADMIN"));
 
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/role/1"))
@@ -124,7 +124,7 @@ public class RoleUnitTestController {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.role").value("ADMIN"));
+                .andExpect(jsonPath("$.roleName").value("ADMIN"));
 
     }
 
@@ -156,7 +156,7 @@ public class RoleUnitTestController {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.role").value("ADMIN"));
+                .andExpect(jsonPath("$.roleName").value("ADMIN"));
 
     }
 

@@ -11,6 +11,9 @@ import com.example.kromannreumert.todo.entity.ToDo;
 import com.example.kromannreumert.todo.mapper.ToDoMapper;
 import com.example.kromannreumert.todo.repository.ToDoRepository;
 import com.example.kromannreumert.todo.service.ToDoService;
+import com.example.kromannreumert.user.entity.Role;
+import com.example.kromannreumert.user.entity.User;
+import com.example.kromannreumert.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,8 +29,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ToDoUnitTest {
@@ -44,6 +46,9 @@ public class ToDoUnitTest {
     @Mock
     LoggingService loggingService;
 
+    @Mock
+    UserRepository userRepository;
+
     @Test
     void getToDoSize_returnsNumberOfTodos() {
         List<ToDo> toDos = List.of(new ToDo(), new ToDo(), new ToDo());
@@ -56,8 +61,17 @@ public class ToDoUnitTest {
     }
 
     @Test
-    void findAll_returnsMappedDtosNotArchivedAndLogs() {
-        String userName = "jurist";
+    void findAll_asAdmin_usesFindAllByArchivedFalse_andLogs() {
+        String userName = "admin";
+
+        Role adminRole = new Role(1L, "ADMIN");
+        User admin = User.builder()
+                .username(userName)
+                .name("Admin User")
+                .email("admin@example.com")
+                .password("secret")
+                .roles(Set.of(adminRole))
+                .build();
 
         ToDo entity = new ToDo(
                 1L,
@@ -86,6 +100,7 @@ public class ToDoUnitTest {
                 entity.getArchived()
         );
 
+        when(userRepository.findByUsername(userName)).thenReturn(Optional.of(admin));
         when(toDoRepository.findAllByArchivedFalse()).thenReturn(List.of(entity));
         when(toDoMapper.toToDoResponseDto(entity)).thenReturn(dto);
 
@@ -94,7 +109,66 @@ public class ToDoUnitTest {
         assertEquals(1, result.size());
         assertEquals(dto, result.getFirst());
 
+        verify(userRepository).findByUsername(userName);
         verify(toDoRepository).findAllByArchivedFalse();
+        verify(toDoRepository, never()).findDistinctByCaseId_Users_UsernameAndArchivedFalse(anyString());
+        verify(toDoMapper).toToDoResponseDto(entity);
+        verify(loggingService).log(eq(LogAction.VIEW_ALL_TODOS), eq(userName), anyString());
+    }
+
+    @Test
+    void findAll_asJurist_usesCaseAssigneeQuery_andLogs() {
+        String userName = "jurist";
+
+        Role juristRole = new Role(4L, "JURIST");
+        User jurist = User.builder()
+                .username(userName)
+                .name("Jurist User")
+                .email("jurist@example.com")
+                .password("secret")
+                .roles(Set.of(juristRole))
+                .build();
+
+        ToDo entity = new ToDo(
+                1L,
+                "test",
+                "beskrivelse",
+                null,
+                LocalDateTime.now(),
+                LocalDate.now(),
+                LocalDate.now().plusDays(1),
+                Priority.MEDIUM,
+                Status.NOT_STARTED,
+                false,
+                Set.of()
+        );
+
+        ToDoResponseDto dto = new ToDoResponseDto(
+                1L,
+                "test",
+                "beskrivelse",
+                entity.getCreated(),
+                entity.getStartDate(),
+                entity.getEndDate(),
+                entity.getUsers(),
+                entity.getPriority(),
+                entity.getStatus(),
+                entity.getArchived()
+        );
+
+        when(userRepository.findByUsername(userName)).thenReturn(Optional.of(jurist));
+        when(toDoRepository.findDistinctByCaseId_Users_UsernameAndArchivedFalse(userName))
+                .thenReturn(List.of(entity));
+        when(toDoMapper.toToDoResponseDto(entity)).thenReturn(dto);
+
+        List<ToDoResponseDto> result = toDoService.findAll(userName);
+
+        assertEquals(1, result.size());
+        assertEquals(dto, result.getFirst());
+
+        verify(userRepository).findByUsername(userName);
+        verify(toDoRepository).findDistinctByCaseId_Users_UsernameAndArchivedFalse(userName);
+        verify(toDoRepository, never()).findAllByArchivedFalse();
         verify(toDoMapper).toToDoResponseDto(entity);
         verify(loggingService).log(eq(LogAction.VIEW_ALL_TODOS), eq(userName), anyString());
     }
@@ -270,5 +344,50 @@ public class ToDoUnitTest {
         verify(toDoRepository).save(existing);
         verify(toDoMapper).toToDoResponseDto(existing);
         verify(loggingService).log(eq(LogAction.UPDATE_TODO), eq(userName), anyString());
+    }
+
+    @Test
+    void findAssignedToUser_usesAssigneeQuery_andLogs() {
+        String userName = "worker01";
+
+        ToDo entity = new ToDo(
+                1L,
+                "NDA",
+                "Draft",
+                null,
+                LocalDateTime.now(),
+                LocalDate.now(),
+                LocalDate.now().plusDays(1),
+                Priority.HIGH,
+                Status.NOT_STARTED,
+                false,
+                Set.of()
+        );
+
+        ToDoResponseDto dto = new ToDoResponseDto(
+                1L,
+                "NDA",
+                "Draft",
+                entity.getCreated(),
+                entity.getStartDate(),
+                entity.getEndDate(),
+                entity.getUsers(),
+                entity.getPriority(),
+                entity.getStatus(),
+                entity.getArchived()
+        );
+
+        when(toDoRepository.findDistinctByUsers_UsernameAndArchivedFalse(userName))
+                .thenReturn(List.of(entity));
+        when(toDoMapper.toToDoResponseDto(entity)).thenReturn(dto);
+
+        List<ToDoResponseDto> result = toDoService.findAssignedToUser(userName);
+
+        assertEquals(1, result.size());
+        assertEquals(dto, result.getFirst());
+
+        verify(toDoRepository).findDistinctByUsers_UsernameAndArchivedFalse(userName);
+        verify(toDoMapper).toToDoResponseDto(entity);
+        verify(loggingService).log(eq(LogAction.VIEW_ALL_TODOS), eq(userName), anyString());
     }
 }

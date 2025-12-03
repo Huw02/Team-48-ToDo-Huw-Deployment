@@ -88,6 +88,39 @@ public class ToDoUnitTestController {
     }
 
     @Test
+    void getAssignedTodosNotLoggedIn() throws Exception {
+        mockMvc.perform(get("/api/v1/todos/assigned"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = "worker01", roles = "SAGSBEHANDLER")
+    void getAssignedTodosWhileLoggedIn_returnsList() throws Exception {
+        ToDoResponseDto dto = new ToDoResponseDto(
+                1L,
+                "NDA",
+                "Draft NDA",
+                LocalDateTime.now(),
+                LocalDate.now(),
+                LocalDate.now().plusDays(1),
+                Set.of(),
+                Priority.HIGH,
+                Status.NOT_STARTED,
+                false
+        );
+
+        when(toDoService.findAssignedToUser("worker01"))
+                .thenReturn(List.of(dto));
+
+        mockMvc.perform(get("/api/v1/todos/assigned")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].name").value("NDA"));
+    }
+
+    @Test
     @WithMockUser(username = "jurist", roles = "JURIST")
     void getToDoByIdWhileLoggedIn() throws Exception {
         ToDoResponseDto responseDto = new ToDoResponseDto(
@@ -242,8 +275,8 @@ public class ToDoUnitTestController {
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
 
         mockMvc.perform(put("/api/v1/todos/{id}",id)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRequest))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.name").value(responseDto.name()))
@@ -277,8 +310,8 @@ public class ToDoUnitTestController {
         String json = objectMapper.writeValueAsString(requestDto);
 
         mockMvc.perform(put("/api/v1/todos/{id}", id)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
                 .andExpect(status().isNotFound());
     }
 

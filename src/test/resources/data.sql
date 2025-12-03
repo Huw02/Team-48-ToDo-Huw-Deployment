@@ -47,6 +47,7 @@ VALUES (1, 2),
        (1, 3),
        (1, 4);
 
-INSERT INTO todo_assignee (user_id, todo_id)
-VALUES (3, 1),
-       (2, 2);
+INSERT INTO todo_assignee (todo_id, user_id)
+VALUES (1, 3),
+       (2, 2),
+       (1,4);
