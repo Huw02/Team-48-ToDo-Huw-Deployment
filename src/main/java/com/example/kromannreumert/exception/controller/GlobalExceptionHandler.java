@@ -28,17 +28,17 @@ public class GlobalExceptionHandler {
     /*
 
     Creating custom Exception handlers to catch errors and customize the content.
-    Right now all the basic exceptions has been created.
+    Right now only 404 and 5xx has ben created
 
     An example for a full exception created is "ClientNotFoundException"
 
-    TODO create all the exception handlers
+    TODO create all the exception handlers for the Entities
 
      */
 
     /**
-     * Method used to handle not found elements from the database
-     * @param ex is the customized parameter in the exception handler that returns "Client/User/Case/To-do" not found and the id
+     * Method used to handle HTTP code 404 not found elements from the database for all entities "Client/User/Case/To-Do"
+     * @param ex is the customized parameter in the exception handler that returns "Client/User/Case/To-do" not found and a message
      * @param request is the endpoint url that the user has been trying to access
      * @return customized exception object that returns HTTP status code from record: ErrorResponse, customized exception text and the endpoint visited
      */
@@ -62,10 +62,12 @@ public class GlobalExceptionHandler {
 //        return buildResponse(400, ex, req);
 //    }
 
-    @ExceptionHandler(ConflictException.class)
-    public ResponseEntity<?> handle409(Exception ex, WebRequest req) {
-        return buildResponse(409, ex, req);
-    }
+    /**
+     * Method used to handle HTTP code 5xx internal server error for all methods in the system. It displays the log action for the user
+     * but in the terminal it displays the Exception that has been caught
+     * @param ex is the error caught and converted to our customized Audit trail to display for the user such as "View_all_failed"
+     * @return the customized global exception to the requester with the customized audit log
+     */
 
     @ExceptionHandler(ActionFailedException.class)
     public ResponseEntity<?> handle500(ActionFailedException ex) {
@@ -79,34 +81,19 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(500).body("Internal error during: " + ex.getLogAction());
     }
 
+    /*
     /**
      * Method used to handle user not authorized when trying to log in
      * @param ex is the customized parameter in the exception handler (Invalid user credentials)
      * @param req is the endpoint that has been accessed
      * @return customized exception object that returns HTTP status code, customized exception text and the endpoint visited
      */
-    
+
 //    // Change forbidden exception to Unauthorized
 //    @ExceptionHandler(UnauthorizedException.class)
 //    public ResponseEntity<ErrorMessage> unAuthorized(UnauthorizedException ex, WebRequest req) {
 //        return buildResponse(401, ex, req);
 //    }
 
-    /**
-     * Generates the Response when making a request to the endpoint
-     * @param status is HTTP code received from the error message
-     * @param ex is the custom exception that has been thrown
-     * @param req is the endpoint that has been accessed
-     * @return builds the response and sends it to the requester
-     */
 
-    private ResponseEntity<ErrorMessage> buildResponse(int status, Exception ex, WebRequest req) {
-        ErrorMessage msg = new ErrorMessage(
-                status,
-                new Date(),
-                ex.getMessage(),
-                req.getDescription(false)
-        );
-        return ResponseEntity.status(status).body(msg);
-    }
 }
