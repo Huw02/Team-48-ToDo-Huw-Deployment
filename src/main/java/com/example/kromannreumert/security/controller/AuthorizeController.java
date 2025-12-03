@@ -3,6 +3,7 @@ package com.example.kromannreumert.security.controller;
 import com.example.kromannreumert.exception.customException.UserUnauthorizedException;
 import com.example.kromannreumert.security.dto.JwtResponseDTO;
 import com.example.kromannreumert.security.dto.LoginDTO;
+import com.example.kromannreumert.user.dto.UserMeResponseDTO;
 import com.example.kromannreumert.user.entity.User;
 import com.example.kromannreumert.security.service.LoginService;
 import com.example.kromannreumert.user.service.UserService;
@@ -10,9 +11,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
+import java.util.List;
+import java.util.stream.Collectors;
 import java.security.Principal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/auth")
@@ -57,5 +63,32 @@ public class AuthorizeController {
             log.error("Could not create user {}", user.getName());
             return new ResponseEntity<>("Could not create user",HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserMeResponseDTO> getCurrentUser(Principal principal) {
+        // 1. Get the Authentication object from the Security Context
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // Check if the principal is null or not authenticated (Security filter should catch this,
+        // but it's a good safety check)
+        if (principal == null || authentication == null || !authentication.isAuthenticated()) {
+            log.warn("Unauthorized access attempt to /auth/me");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        // 2. Get the username from the Principal object
+        String username = principal.getName();
+
+        // 3. Get the roles/authorities
+        List<String> roles = authentication.getAuthorities().stream()
+                .map(authority -> authority.getAuthority())
+                .collect(Collectors.toList());
+
+        log.info("Controller: Accessed /me for user {} with roles: {}", username, roles);
+
+        // 4. Create and return the response DTO
+        UserMeResponseDTO response = new UserMeResponseDTO(username, roles.getFirst());
+        return ResponseEntity.ok(response);
     }
 }
