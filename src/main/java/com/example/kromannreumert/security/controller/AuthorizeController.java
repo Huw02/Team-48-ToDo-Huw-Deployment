@@ -1,6 +1,5 @@
 package com.example.kromannreumert.security.controller;
 
-import com.example.kromannreumert.exception.customException.UserUnauthorizedException;
 import com.example.kromannreumert.security.dto.JwtResponseDTO;
 import com.example.kromannreumert.security.dto.LoginDTO;
 import com.example.kromannreumert.user.dto.UserMeResponseDTO;
@@ -17,8 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.security.Principal;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/auth")
@@ -45,7 +42,7 @@ public class AuthorizeController {
         } catch (Exception e) {
             log.error("Controller: It was not possible to sign the user in {}", loginRequest.username());
             log.error("Login failed due to: {}", e.getMessage());
-            throw new UserUnauthorizedException();
+            throw new RuntimeException(e);
         }
     }
 

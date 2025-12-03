@@ -26,11 +26,7 @@ public class ClientController {
 
     @GetMapping("")
     public ResponseEntity<?> getAllClients(Principal principal) {
-        try {
-            return new ResponseEntity<>(clientService.getAllClients(principal.getName()), HttpStatus.OK);
-        } catch (HttpClientErrorException.NotFound e) {
-            return new ResponseEntity<>("Could not fetch all clients: " + e.getMessage(), HttpStatus.NO_CONTENT);
-        }
+        return new ResponseEntity<>(clientService.getAllClients(principal.getName()), HttpStatus.OK);
     }
 
     @GetMapping("/{idprefix}")
@@ -41,11 +37,7 @@ public class ClientController {
     // This endpoints needs to be removed or changed as there can contain spaces in a client name.
     @GetMapping("/getclientbyname/{clientName}")
     public ResponseEntity<?> getClientByClientName(@PathVariable String clientName, Principal principal) {
-        try {
             return new ResponseEntity<>(clientService.getClientByName(clientName, principal.getName()), HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>("Client not found by client name: " + clientName, HttpStatus.NOT_FOUND);
-        }
     }
 
     @PostMapping("/add")

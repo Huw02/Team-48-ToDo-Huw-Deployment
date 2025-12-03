@@ -1,6 +1,6 @@
 package com.example.kromannreumert.security.service;
 
-import com.example.kromannreumert.exception.customException.UserUnauthorizedException;
+import com.example.kromannreumert.exception.customException.http4xxExceptions.UserNotFoundException;
 import com.example.kromannreumert.logging.entity.LogAction;
 import com.example.kromannreumert.logging.service.LoggingService;
 import com.example.kromannreumert.security.JwtUtil.JwtGenerator;
@@ -62,11 +62,11 @@ public class LoginService {
             loggingService.log(LogAction.LOGIN_SUCCESS, user.getUsername(), "User logged in");
             return new JwtResponseDTO(user.getUsername(), token, roles);
 
-        } catch (UserUnauthorizedException e) {
+        } catch (RuntimeException e) {
 
             log.error("User could not log in {}", loginRequest.username());
             loggingService.log(LogAction.LOGIN_FAILED, loginRequest.username(),"User failed to login");
-            throw new UserUnauthorizedException();
+            throw new RuntimeException(e);
 
         }
     }
