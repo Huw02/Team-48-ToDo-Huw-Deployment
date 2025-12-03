@@ -56,7 +56,7 @@ public class GlobalExceptionHandler {
                 new ErrorResponse(404,
                         "Not Found",
                         ex.getMessage(),
-                        request.getDescription(false),
+                        request.getDescription(true),
                         ex.getAction().name())
         );
     }
@@ -86,7 +86,7 @@ public class GlobalExceptionHandler {
                 500,
                 "Internal Server Error",
                 ex.getCause() != null ? ex.getCause().getMessage() : "Unknown error",
-                String.valueOf(request),
+                request.getDescription(true),
                 ex.getLogAction().name()
                 )
         );
