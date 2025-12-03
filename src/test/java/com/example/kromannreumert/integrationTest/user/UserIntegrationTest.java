@@ -102,6 +102,13 @@ public class UserIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").value("Deleted user with user id: " + 1));
     }
+    @Test
+    void getUserNumber()throws Exception{
+        mockMvc.perform(get(baseUrl + "/size").with(user("ADMIN").roles("ADMIN")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value(4));
+    }
+
 
 
 }

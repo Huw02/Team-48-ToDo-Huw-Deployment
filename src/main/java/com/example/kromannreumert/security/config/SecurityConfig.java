@@ -38,7 +38,8 @@ public class SecurityConfig {
 
                         // Other endpoints
                         .requestMatchers("/api/v1/todos/**").hasAnyRole("ADMIN", "PARTNER", "SAGSBEHANDLER", "JURIST")
-                        .requestMatchers("/api/v1/role/**", "/api/v1/user/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/role/**", "/api/v1/user/**", "/api/v1/admin/**").hasRole("ADMIN")
+
 
                         .anyRequest().authenticated()
                 )

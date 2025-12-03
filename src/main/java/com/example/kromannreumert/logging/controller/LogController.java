@@ -32,7 +32,7 @@ public class LogController {
         return loggingService.getAllLogs(principal.getName());
     }
 
-    @GetMapping("getlog/{logId}")
+    @GetMapping("/getlog/{logId}")
     public Logging getOneLog(@PathVariable int logId, Principal principal){
         return loggingService.getLogById(logId, principal.getName());
     }
