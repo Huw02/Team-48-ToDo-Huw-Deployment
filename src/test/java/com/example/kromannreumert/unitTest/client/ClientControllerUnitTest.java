@@ -4,6 +4,8 @@ import com.example.kromannreumert.client.DTO.*;
 import com.example.kromannreumert.client.controller.ClientController;
 import com.example.kromannreumert.client.entity.Client;
 import com.example.kromannreumert.client.service.ClientService;
+import com.example.kromannreumert.exception.controller.GlobalExceptionHandler;
+import com.example.kromannreumert.logging.service.LoggingService;
 import com.example.kromannreumert.security.config.SecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -40,6 +42,11 @@ public class ClientControllerUnitTest {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    // Need to add this after global exceptions has been created
+    @MockitoBean
+    private LoggingService loggingService;
+
 
     private final String BASE = "/api/v1/client/";
 

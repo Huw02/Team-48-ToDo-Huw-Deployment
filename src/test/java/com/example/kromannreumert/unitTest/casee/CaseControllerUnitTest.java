@@ -4,6 +4,7 @@ import com.example.kromannreumert.casee.controller.CaseController;
 import com.example.kromannreumert.casee.dto.*;
 import com.example.kromannreumert.casee.entity.Casee;
 import com.example.kromannreumert.casee.service.CaseService;
+import com.example.kromannreumert.logging.service.LoggingService;
 import com.example.kromannreumert.security.config.SecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,10 @@ public class CaseControllerUnitTest {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    // Need to add this after global exceptions has been created
+    @MockitoBean
+    private LoggingService loggingService;
 
     private final String BASE = "/api/v1/cases";
 

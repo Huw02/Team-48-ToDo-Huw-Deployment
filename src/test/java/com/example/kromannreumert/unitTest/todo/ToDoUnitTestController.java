@@ -1,5 +1,6 @@
 package com.example.kromannreumert.unitTest.todo;
 
+import com.example.kromannreumert.logging.service.LoggingService;
 import com.example.kromannreumert.security.config.SecurityConfig;
 import com.example.kromannreumert.todo.controller.ToDoController;
 import com.example.kromannreumert.todo.dto.ToDoRequestDto;
@@ -43,6 +44,10 @@ public class ToDoUnitTestController {
 
     @MockitoBean
     private ToDoService toDoService;
+
+    // Need to add this after global exceptions has been created
+    @MockitoBean
+    private LoggingService loggingService;
 
     @Test
     void getAllTodosNotLoggedIn() throws Exception{

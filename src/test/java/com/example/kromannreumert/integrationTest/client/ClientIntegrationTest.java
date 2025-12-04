@@ -254,7 +254,7 @@ public class ClientIntegrationTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(DTO)))
                     .andExpect(status().isOk())
-                    .andExpect(jsonPath("$").value("Cannot update the same name"));
+                    .andExpect(jsonPath("$").value("Client name unchanged"));
         }
     }
 

@@ -70,7 +70,7 @@ public class ClientUnitTest {
         assertEquals(createClient.getIDPrefix(), result.getFirst().idPrefix());
         verify(clientRepository).findAll();
         verify(clientMapper).toClientDTO(createClient);
-        verify(loggingService).log(eq(LogAction.VIEW_ALL_CLIENTS), eq("Abdi"), contains("fetched all clients successfully"));
+        verify(loggingService).log(eq(LogAction.VIEW_ALL_CLIENTS), eq("Abdi"), eq("Fetched all clients"));
 
     }
 
@@ -98,7 +98,7 @@ public class ClientUnitTest {
         assertEquals(createClient.getIDPrefix(), result.idPrefix());
         verify(clientRepository).getClientByIDPrefix(idPrefix);
         verify(clientMapper).toClientDTO(createClient);
-        verify(loggingService).log(eq(LogAction.VIEW_ONE_CLIENT), eq("Tester"), contains("id prefix"));
+        verify(loggingService).log(eq(LogAction.VIEW_ONE_CLIENT), eq("Tester"), eq("Viewed client with prefix: " + idPrefix));
     }
 
     @Test
@@ -211,13 +211,9 @@ public class ClientUnitTest {
         assertEquals(result, "Successfully updated client with: " + updateID.idPrefix());
         verify(clientRepository).findClientByName(clientName);
         verify(clientRepository).save(any(Client.class));
-        verify(loggingService).log(eq(LogAction.UPDATE_CLIENT), eq("Updater"), contains(clientName));
+        verify(loggingService).log(eq(LogAction.UPDATE_CLIENT), eq("Updater"), eq("Updated client prefix"));
     }
 
-    @Test
-    void should_update_client_userList() {
-        // TODO: Add updateClientUserList test
-    }
 
     @Test
     void should_delete_client() {
