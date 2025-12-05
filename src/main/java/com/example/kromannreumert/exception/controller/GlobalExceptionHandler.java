@@ -61,9 +61,9 @@ public class GlobalExceptionHandler {
                 ex.getMessage()
         );
 
-        return ResponseEntity.status(404).body(
+        return ResponseEntity.status(400).body(
                 new ErrorResponse(
-                        404,
+                        400,
                         "Bad Request",
                         ex.getMessage(),
                         request.getDescription(true),
@@ -102,8 +102,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ActionFailedException.class)
     public ResponseEntity<ErrorResponse> handle500(ActionFailedException ex, WebRequest request) {
 
-        log.error(ex.getCause().getMessage());
-        loggingService.log(
+        log.error(ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage(), ex);
+
+            loggingService.log(
                 ex.getLogAction(),
                 ex.getActor(),
                 ex.getCause().getMessage()
