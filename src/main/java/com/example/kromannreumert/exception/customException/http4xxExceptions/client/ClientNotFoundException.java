@@ -1,5 +1,6 @@
-package com.example.kromannreumert.exception.customException.http4xxExceptions;
+package com.example.kromannreumert.exception.customException.http4xxExceptions.client;
 
+import com.example.kromannreumert.exception.customException.http4xxExceptions.NotFoundException;
 import com.example.kromannreumert.logging.entity.LogAction;
 
 public class ClientNotFoundException extends NotFoundException {

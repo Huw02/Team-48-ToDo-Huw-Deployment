@@ -22,6 +22,7 @@ public class Logging {
     @Enumerated(EnumType.STRING)
     private LogAction action;
 
+    @Lob
     private String details;
 
     private LocalDateTime timestamp = LocalDateTime.now();

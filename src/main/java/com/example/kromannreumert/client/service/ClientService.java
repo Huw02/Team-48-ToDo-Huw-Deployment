@@ -5,19 +5,17 @@ import com.example.kromannreumert.client.entity.Client;
 import com.example.kromannreumert.client.mapper.ClientMapper;
 import com.example.kromannreumert.client.repository.ClientRepository;
 import com.example.kromannreumert.exception.customException.http4xxExceptions.ApiBusinessException;
-import com.example.kromannreumert.exception.customException.http4xxExceptions.ClientNotFoundException;
+import com.example.kromannreumert.exception.customException.http4xxExceptions.client.ClientConflictException;
+import com.example.kromannreumert.exception.customException.http4xxExceptions.client.ClientNotFoundException;
 import com.example.kromannreumert.exception.customException.http4xxExceptions.UserNotFoundException;
 import com.example.kromannreumert.exception.customException.http5xxException.ActionFailedException;
 import com.example.kromannreumert.logging.entity.LogAction;
 import com.example.kromannreumert.logging.service.LoggingService;
 import com.example.kromannreumert.user.entity.User;
 import com.example.kromannreumert.user.repository.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -169,9 +167,10 @@ public class ClientService {
                             ));
 
             if (client.getName().equals(dto.newName())) {
-                loggingService.log(LogAction.UPDATE_CLIENT_FAILED, actor,
-                        "Attempted to update name with same value");
-                return "Client name unchanged";
+                throw new ClientConflictException(
+                        LogAction.UPDATE_CLIENT_FAILED, actor,
+                        "Attempted to update name with same value"
+                );
             }
 
             client.setName(dto.newName());
@@ -199,9 +198,10 @@ public class ClientService {
                             ));
 
             if (client.getIDPrefix().equals(dto.idPrefix())) {
-                loggingService.log(LogAction.UPDATE_CLIENT_FAILED, actor,
-                        "Attempted to update prefix with same value");
-                return "Client prefix unchanged";
+                throw new ClientConflictException(
+                        LogAction.UPDATE_CLIENT_FAILED, actor,
+                        "Attempted to update name with same value"
+                );
             }
 
             client.setIDPrefix(dto.idPrefix());
@@ -255,6 +255,14 @@ public class ClientService {
 
     public String deleteClient(Long id, String actor) {
         try {
+
+            if(clientRepository.findById(id).isEmpty()) {
+                throw new ClientNotFoundException(
+                        LogAction.DELETE_CLIENT_FAILED,
+                        actor,
+                        "Not able to delete client with id: " + id + " as it does not exist");
+            };
+
             clientRepository.deleteById(id);
 
             loggingService.log(LogAction.DELETE_CLIENT, actor,

@@ -224,6 +224,7 @@ public class ClientUnitTest {
         Long id = 1L;
         Client client = new Client(id, clientName, Set.of(), idPrefix);
 
+        when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
         doNothing().when(clientRepository).deleteById(id);
 
         // ACT
@@ -235,6 +236,7 @@ public class ClientUnitTest {
         assertEquals(result, expectedResult);
         verify(clientRepository).deleteById(id);
         verify(loggingService).log(eq(LogAction.DELETE_CLIENT), eq("Remover"), contains(id.toString()));
+        verify(clientRepository).findById(id);
     }
 
 

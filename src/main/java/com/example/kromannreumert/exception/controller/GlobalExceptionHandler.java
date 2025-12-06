@@ -1,10 +1,10 @@
 package com.example.kromannreumert.exception.controller;
 
 
+import com.example.kromannreumert.exception.customException.http4xxExceptions.BadRequestException;
+import com.example.kromannreumert.exception.customException.http4xxExceptions.ConflictException;
 import com.example.kromannreumert.exception.customException.http4xxExceptions.NotFoundException;
 import com.example.kromannreumert.exception.customException.http5xxException.ActionFailedException;
-import com.example.kromannreumert.exception.customException.http5xxException.ConflictException;
-import com.example.kromannreumert.exception.entity.ErrorMessage;
 import com.example.kromannreumert.exception.entity.ErrorResponse;
 import com.example.kromannreumert.logging.service.LoggingService;
 import lombok.extern.slf4j.Slf4j;
@@ -12,8 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
-
-import java.util.Date;
 
 @Slf4j
 @ControllerAdvice
@@ -25,17 +23,6 @@ public class GlobalExceptionHandler {
         this.loggingService = loggingService;
     }
 
-    /*
-
-    Creating custom Exception handlers to catch errors and customize the content.
-    Right now only 404 and 5xx has ben created
-
-    An example for a full exception created is "ClientNotFoundException"
-
-    TODO create all the exception handlers for the Entities
-
-     */
-
     /**
      * Method used to handle HTTP code 404 not found elements from the database for all entities "Client/User/Case/To-Do"
      * @param ex is the customized parameter in the exception handler that returns "Client/User/Case/To-do" not found and a message
@@ -44,8 +31,10 @@ public class GlobalExceptionHandler {
      */
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<?> handleNotFound404(NotFoundException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handleNotFound404(NotFoundException ex, WebRequest request) {
 
+
+        log.error("Exception not found occurred:  {}", ex.getMessage());
         loggingService.log(
                 ex.getAction(),
                 ex.getActor(),
@@ -61,10 +50,47 @@ public class GlobalExceptionHandler {
         );
     }
 
-//    @ExceptionHandler(BadRequestException.class)
-//    public ResponseEntity<ErrorMessage> handleBadRequest400(BadRequestException ex, WebRequest req) {
-//        return buildResponse(400, ex, req);
-//    }
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequest400(BadRequestException ex, WebRequest request) {
+
+
+        log.error("Bad request occurred: {}", ex.getMessage());
+        loggingService.log(
+                ex.getAction(),
+                ex.getActor(),
+                ex.getMessage()
+        );
+
+        return ResponseEntity.status(400).body(
+                new ErrorResponse(
+                        400,
+                        "Bad Request",
+                        ex.getMessage(),
+                        request.getDescription(true),
+                        ex.getAction().name())
+        );
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ErrorResponse> handleConflict409(ConflictException ex, WebRequest request) {
+
+        log.error("Conflict occurred: {}", ex.getMessage());
+        loggingService.log(
+                ex.getAction(),
+                ex.getActor(),
+                ex.getMessage()
+        );
+
+        return ResponseEntity.status(409).body(
+                new ErrorResponse(
+                        409,
+                        "Conflict",
+                        ex.getMessage(),
+                        request.getDescription(true),
+                        ex.getAction().name())
+        );
+    }
+
 
     /**
      * Method used to handle HTTP code 5xx internal server error for all methods in the system. It displays the log action for the user
@@ -74,12 +100,14 @@ public class GlobalExceptionHandler {
      */
 
     @ExceptionHandler(ActionFailedException.class)
-    public ResponseEntity<?> handle500(ActionFailedException ex, WebRequest request) {
+    public ResponseEntity<ErrorResponse> handle500(ActionFailedException ex, WebRequest request) {
 
-        loggingService.log(
+        log.error(ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage(), ex);
+
+            loggingService.log(
                 ex.getLogAction(),
                 ex.getActor(),
-                ex.getCause() != null ? ex.getCause().getMessage() : "Unknown error"
+                ex.getCause().getMessage()
         );
 
         return ResponseEntity.status(500).body(new ErrorResponse(

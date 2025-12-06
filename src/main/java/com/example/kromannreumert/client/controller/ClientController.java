@@ -42,58 +42,34 @@ public class ClientController {
 
     @PostMapping("/add")
     public ResponseEntity<?> addClient(@RequestBody ClientRequestDTO clientRequestDTO, Principal principal) {
-        try {
-            return new ResponseEntity<>(clientService.addClient(clientRequestDTO, principal.getName()), HttpStatus.CREATED);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>("Failed to create the client: " + clientRequestDTO.clientName(), HttpStatus.BAD_REQUEST);
-        }
+        return new ResponseEntity<>(clientService.addClient(clientRequestDTO, principal.getName()), HttpStatus.CREATED);
     }
 
     @PatchMapping("/update/id")
     public ResponseEntity<?> updateClientIdPrefix(@RequestBody UpdateClientIdPrefixDTO clientIdPrefixDTO, Principal principal) {
-        try {
             return new ResponseEntity<>(clientService.updateClientIdPrefix(clientIdPrefixDTO, principal.getName()), HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>("Failed to update the client: " + clientIdPrefixDTO.clientName(), HttpStatus.BAD_REQUEST);
-        }
     }
 
     @PatchMapping("/update/name")
     public ResponseEntity<?> updateClientName(@RequestBody UpdateClientNameDTO clientNameDTO, Principal principal) {
-        try {
             return new ResponseEntity<>(clientService.updateClientName(clientNameDTO, principal.getName()), HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>("Failed to update the client: " + clientNameDTO.oldName(), HttpStatus.BAD_REQUEST);
-        }
     }
 
 
    @PutMapping("/update/users")
    public ResponseEntity<?> updateClientUsers(@RequestBody UpdateClientUserList clientUserList, Principal principal) {
-       try {
            return new ResponseEntity<>(clientService.updateClientUserList(clientUserList, principal.getName()), HttpStatus.OK);
-       } catch (RuntimeException e) {
-           return new ResponseEntity<>("Failed to update the client: " + clientUserList, HttpStatus.BAD_REQUEST);
-       }
    }
 
    @GetMapping("/user/{idprefix}")
     public ResponseEntity<?> getUserByClient(@PathVariable Long idprefix, Principal principal) {
-        try {
             return new ResponseEntity<>(clientService.getUserFromClient(idprefix, principal.getName()), HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>("Failed to retrieve the client user list", HttpStatus.NOT_FOUND);
-        }
    }
 
    @GetMapping("/size")
     public ResponseEntity<?> getClientSize(Principal principal) {
-       try {
            return new ResponseEntity<>(clientService.getClientSize(principal.getName()), HttpStatus.OK);
-       } catch (RuntimeException e) {
-           return new ResponseEntity<>("Failed to retrieve the client user list", HttpStatus.NO_CONTENT);
        }
-   }
 
    @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteClient(@PathVariable Long id, Principal principal) {
