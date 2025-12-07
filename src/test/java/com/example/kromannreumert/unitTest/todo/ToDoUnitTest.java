@@ -1,5 +1,7 @@
 package com.example.kromannreumert.unitTest.todo;
 
+import com.example.kromannreumert.casee.entity.Casee;
+import com.example.kromannreumert.casee.repository.CaseRepository;
 import com.example.kromannreumert.logging.entity.LogAction;
 import com.example.kromannreumert.logging.service.LoggingService;
 import com.example.kromannreumert.todo.dto.ToDoRequestDto;
@@ -48,6 +50,9 @@ public class ToDoUnitTest {
 
     @Mock
     UserRepository userRepository;
+
+    @Mock
+    CaseRepository caseRepository;
 
     @Test
     void getToDoSize_returnsNumberOfTodos() {
@@ -220,36 +225,31 @@ public class ToDoUnitTest {
                 Priority.MEDIUM
         );
 
-        ToDo entityBeforeSave = new ToDo(
-                null,
-                request.name(),
-                request.description(),
-                null,
-                LocalDateTime.now(),
-                request.startDate(),
-                request.endDate(),
-                request.priority(),
-                Status.NOT_STARTED,
-                false,
-                Set.of()
-        );
+        Casee casee = new Casee();
+        casee.setId(1L);
 
-        ToDo entityAfterSave = new ToDo(
-                1L,
-                request.name(),
-                request.description(),
-                null,
-                entityBeforeSave.getCreated(),
-                request.startDate(),
-                request.endDate(),
-                request.priority(),
-                Status.NOT_STARTED,
-                false,
-                Set.of()
-        );
+        ToDo entityBeforeSave = new ToDo();
+        entityBeforeSave.setName(request.name());
+        entityBeforeSave.setDescription(request.description());
+        entityBeforeSave.setStartDate(request.startDate());
+        entityBeforeSave.setEndDate(request.endDate());
+        entityBeforeSave.setPriority(request.priority());
+        entityBeforeSave.setStatus(Status.NOT_STARTED);
+        entityBeforeSave.setArchived(false);
+
+        ToDo entityAfterSave = new ToDo();
+        entityAfterSave.setId(10L);
+        entityAfterSave.setName(request.name());
+        entityAfterSave.setDescription(request.description());
+        entityAfterSave.setStartDate(request.startDate());
+        entityAfterSave.setEndDate(request.endDate());
+        entityAfterSave.setPriority(request.priority());
+        entityAfterSave.setStatus(Status.NOT_STARTED);
+        entityAfterSave.setArchived(false);
+        entityAfterSave.setCaseId(casee);
 
         ToDoResponseDto responseDto = new ToDoResponseDto(
-                1L,
+                10L,
                 request.name(),
                 request.description(),
                 entityAfterSave.getCreated(),
@@ -261,6 +261,7 @@ public class ToDoUnitTest {
                 false
         );
 
+        when(caseRepository.findById(1L)).thenReturn(Optional.of(casee));
         when(toDoMapper.toToDo(request)).thenReturn(entityBeforeSave);
         when(toDoRepository.save(entityBeforeSave)).thenReturn(entityAfterSave);
         when(toDoMapper.toToDoResponseDto(entityAfterSave)).thenReturn(responseDto);
@@ -268,6 +269,9 @@ public class ToDoUnitTest {
         ToDoResponseDto result = toDoService.createToDo(userName, request);
 
         assertEquals(responseDto, result);
+        assertEquals(casee, entityAfterSave.getCaseId());
+
+        verify(caseRepository).findById(1L);
         verify(toDoMapper).toToDo(request);
         verify(toDoRepository).save(entityBeforeSave);
         verify(toDoMapper).toToDoResponseDto(entityAfterSave);
