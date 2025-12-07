@@ -1,9 +1,8 @@
 package com.example.kromannreumert.todo.controller;
 
-import com.example.kromannreumert.todo.dto.ToDoRequestDto;
-import com.example.kromannreumert.todo.dto.ToDoRequestNewToDoDto;
-import com.example.kromannreumert.todo.dto.ToDoResponseDto;
+import com.example.kromannreumert.todo.dto.*;
 import com.example.kromannreumert.todo.service.ToDoService;
+import com.example.kromannreumert.user.entity.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.security.Principal;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("api/v1")
@@ -40,6 +40,30 @@ public class ToDoController {
             return ResponseEntity.ok(responseDtos);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/todos/{id}/case-assignees")
+    public ResponseEntity<Set<User>> getCaseAssigneesForTodo(@PathVariable Long id) {
+        try {
+            Set<User> users = toDoService.getCaseAssigneesForTodo(id);
+            return ResponseEntity.ok(users);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @PatchMapping("/todos/{id}/assignees")
+    public ResponseEntity<ToDoResponseDto> updateAssignees(
+            @PathVariable Long id,
+            @RequestBody ToDoAssigneeUpdateRequest request,
+            Principal principal
+    ) {
+        try {
+            ToDoResponseDto updated = toDoService.updateAssignees(id, request, principal.getName());
+            return ResponseEntity.ok(updated);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 

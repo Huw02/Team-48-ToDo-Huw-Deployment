@@ -4,6 +4,7 @@ import com.example.kromannreumert.casee.entity.Casee;
 import com.example.kromannreumert.casee.repository.CaseRepository;
 import com.example.kromannreumert.logging.entity.LogAction;
 import com.example.kromannreumert.logging.service.LoggingService;
+import com.example.kromannreumert.todo.dto.ToDoAssigneeUpdateRequest;
 import com.example.kromannreumert.todo.dto.ToDoRequestDto;
 import com.example.kromannreumert.todo.dto.ToDoRequestNewToDoDto;
 import com.example.kromannreumert.todo.dto.ToDoResponseDto;
@@ -18,8 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
-
-import static org.springframework.security.authorization.AuthorityReactiveAuthorizationManager.hasRole;
+import java.util.stream.Collectors;
 
 @Service
 public class ToDoService {
@@ -96,6 +96,29 @@ public class ToDoService {
 
             throw new RuntimeException("Todo not found with id: " + id, e);
         }
+    }
+
+    public Set<User> getCaseAssigneesForTodo(Long todoId) {
+        ToDo todo = toDoRepository.findById(todoId)
+                .orElseThrow(() -> new EntityNotFoundException("Todo not found"));
+
+        Casee casee = todo.getCaseId();
+        return casee.getUsers();
+    }
+
+    public ToDoResponseDto updateAssignees(Long todoId, ToDoAssigneeUpdateRequest request, String name) {
+        ToDo todo = toDoRepository.findById(todoId)
+                .orElseThrow(() -> new EntityNotFoundException("Todo not found"));
+
+        Set<User> newAssignees = request.userIds().stream()
+                .map(id -> userRepository.findById(id.intValue())
+                        .orElseThrow(() -> new EntityNotFoundException("User not found: " + id)))
+                .collect(Collectors.toSet());
+
+        todo.setUsers(newAssignees);
+
+        ToDo saved = toDoRepository.save(todo);
+        return toDoMapper.toToDoResponseDto(saved);
     }
 
     public ToDoResponseDto createToDo(String name, ToDoRequestNewToDoDto todoRequestDto) {
