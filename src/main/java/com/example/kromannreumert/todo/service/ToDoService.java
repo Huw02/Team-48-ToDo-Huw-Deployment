@@ -1,7 +1,10 @@
 package com.example.kromannreumert.todo.service;
 
+import com.example.kromannreumert.casee.entity.Casee;
+import com.example.kromannreumert.casee.repository.CaseRepository;
 import com.example.kromannreumert.logging.entity.LogAction;
 import com.example.kromannreumert.logging.service.LoggingService;
+import com.example.kromannreumert.todo.dto.ToDoAssigneeUpdateRequest;
 import com.example.kromannreumert.todo.dto.ToDoRequestDto;
 import com.example.kromannreumert.todo.dto.ToDoRequestNewToDoDto;
 import com.example.kromannreumert.todo.dto.ToDoResponseDto;
@@ -11,12 +14,12 @@ import com.example.kromannreumert.todo.repository.ToDoRepository;
 import com.example.kromannreumert.user.entity.Role;
 import com.example.kromannreumert.user.entity.User;
 import com.example.kromannreumert.user.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
-
-import static org.springframework.security.authorization.AuthorityReactiveAuthorizationManager.hasRole;
+import java.util.stream.Collectors;
 
 @Service
 public class ToDoService {
@@ -25,12 +28,14 @@ public class ToDoService {
     private final ToDoMapper toDoMapper;
     private final LoggingService loggingService;
     private final UserRepository userRepository;
+    private final CaseRepository caseRepository;
 
-    public ToDoService(ToDoRepository toDoRepository, ToDoMapper toDoMapper, LoggingService loggingService, UserRepository userRepository) {
+    public ToDoService(ToDoRepository toDoRepository, ToDoMapper toDoMapper, LoggingService loggingService, UserRepository userRepository, CaseRepository caseRepository) {
         this.toDoRepository = toDoRepository;
         this.toDoMapper = toDoMapper;
         this.loggingService = loggingService;
         this.userRepository = userRepository;
+        this.caseRepository = caseRepository;
     }
 
     public int getToDoSize() {
@@ -93,9 +98,35 @@ public class ToDoService {
         }
     }
 
+    public Set<User> getCaseAssigneesForTodo(Long todoId) {
+        ToDo todo = toDoRepository.findById(todoId)
+                .orElseThrow(() -> new EntityNotFoundException("Todo not found"));
+
+        Casee casee = todo.getCaseId();
+        return casee.getUsers();
+    }
+
+    public ToDoResponseDto updateAssignees(Long todoId, ToDoAssigneeUpdateRequest request, String name) {
+        ToDo todo = toDoRepository.findById(todoId)
+                .orElseThrow(() -> new EntityNotFoundException("Todo not found"));
+
+        Set<User> newAssignees = request.userIds().stream()
+                .map(id -> userRepository.findById(id.intValue())
+                        .orElseThrow(() -> new EntityNotFoundException("User not found: " + id)))
+                .collect(Collectors.toSet());
+
+        todo.setUsers(newAssignees);
+
+        ToDo saved = toDoRepository.save(todo);
+        return toDoMapper.toToDoResponseDto(saved);
+    }
+
     public ToDoResponseDto createToDo(String name, ToDoRequestNewToDoDto todoRequestDto) {
         try {
+            Casee casee = caseRepository.findById(todoRequestDto.caseId())
+                    .orElseThrow(() -> new EntityNotFoundException("Case not found"));
             ToDo toDo = toDoMapper.toToDo(todoRequestDto);
+            toDo.setCaseId(casee);
             toDo = toDoRepository.save(toDo);
 
             loggingService.log(LogAction.CREATE_TODO, name, "Created a todo: " + toDo.getName());

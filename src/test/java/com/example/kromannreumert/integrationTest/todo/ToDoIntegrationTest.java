@@ -68,6 +68,7 @@ public class ToDoIntegrationTest {
         ToDoRequestNewToDoDto requestDto = new ToDoRequestNewToDoDto(
                 "test",
                 "dette er en test",
+                1L,
                 LocalDate.of(2025, 12, 1),
                 LocalDate.of(2025, 12, 2),
                 Priority.MEDIUM
