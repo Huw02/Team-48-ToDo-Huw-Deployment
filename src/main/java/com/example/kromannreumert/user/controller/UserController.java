@@ -13,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/user")
+@CrossOrigin(origins = "*")
 public class UserController {
 
 
@@ -30,6 +31,14 @@ public class UserController {
     @GetMapping("/{userId}")
     public ResponseEntity<UserResponseDTO>getUserById(@PathVariable int userId, Principal principal){
         return new ResponseEntity<>(userService.getUserByUserId(userId, principal.getName()), HttpStatus.OK);
+    }
+    @PostMapping("")
+    public ResponseEntity<UserResponseDTO> createAccount(@RequestBody UserRequestDTO user, Principal principal) {
+        if(user != null){
+            return new ResponseEntity<>(userService.createUser(user, principal.getName()), HttpStatus.OK);
+        }else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PutMapping("/{userId}")

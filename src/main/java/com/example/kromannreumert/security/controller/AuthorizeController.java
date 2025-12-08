@@ -50,17 +50,6 @@ public class AuthorizeController {
     ADD @PreAuthorize("hasRole('ADMIN')") when we are ready for it. It sets security on method level, so if someone access it with
     an unauthorized jwt token they will get denied
      */
-    @PostMapping("/create")
-    public ResponseEntity<?> createAccount(@RequestBody User user, Principal principal) {
-        try {
-            log.info("User created controller accessed by {}", user.getName());
-            String test = userService.createUser(user, principal.getName());
-            return ResponseEntity.ok(test);
-        } catch (RuntimeException e) {
-            log.error("Could not create user {}", user.getName());
-            return new ResponseEntity<>("Could not create user",HttpStatus.BAD_REQUEST);
-        }
-    }
 
     @GetMapping("/me")
     public ResponseEntity<UserMeResponseDTO> getCurrentUser(Principal principal) {

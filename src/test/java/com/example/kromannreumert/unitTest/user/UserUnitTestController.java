@@ -48,8 +48,7 @@ public class UserUnitTestController {
     ObjectMapper objectMapper;
 
     @MockitoBean
-    LoggingService loggingService;
-
+    private LoggingService loggingService;
 
     private final String baseURL = "/api/v1/user";
 
