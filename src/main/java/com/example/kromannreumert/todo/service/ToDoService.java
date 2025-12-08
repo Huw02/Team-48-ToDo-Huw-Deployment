@@ -15,6 +15,7 @@ import com.example.kromannreumert.user.entity.Role;
 import com.example.kromannreumert.user.entity.User;
 import com.example.kromannreumert.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -116,6 +117,14 @@ public class ToDoService {
                 .collect(Collectors.toSet());
 
         todo.setUsers(newAssignees);
+
+        if (request.userIds().size() > todo.getUsers().size()) {
+            loggingService.log(LogAction.ADDED_USERS_TO_TODO, name, "Assigned users to: " + todo.getName());
+        }
+
+        if (request.userIds().size() > todo.getUsers().size()) {
+            loggingService.log(LogAction.REMOVED_USERS_TO_TODO, name, "Removed users from: " + todo.getName());
+        }
 
         ToDo saved = toDoRepository.save(todo);
         return toDoMapper.toToDoResponseDto(saved);
