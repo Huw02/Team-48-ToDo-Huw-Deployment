@@ -270,7 +270,7 @@ public class ToDoIntegrationTest {
 
     @Test
     @WithMockUser(username = "admin", roles = "ADMIN")
-    void updateAssignees_unknownTodo_returnsBadRequest() throws Exception {
+    void updateAssignees_unknownTodo_returnsNotFound() throws Exception {
         ToDoAssigneeUpdateRequest requestDto =
                 new ToDoAssigneeUpdateRequest(List.of(2L));
 
@@ -279,12 +279,12 @@ public class ToDoIntegrationTest {
         mockMvc.perform(patch("/api/v1/todos/{id}/assignees", 9999L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 
     @Test
     @WithMockUser(username = "jurist01", roles = "JURIST")
-    void updateAssignees_withNonExistingUser_returnsBadRequest() throws Exception {
+    void updateAssignees_withNonExistingUser_returnsNotFound() throws Exception {
         ToDoAssigneeUpdateRequest requestDto =
                 new ToDoAssigneeUpdateRequest(List.of(99999L));
 
@@ -293,6 +293,6 @@ public class ToDoIntegrationTest {
         mockMvc.perform(patch("/api/v1/todos/{id}/assignees", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 }
