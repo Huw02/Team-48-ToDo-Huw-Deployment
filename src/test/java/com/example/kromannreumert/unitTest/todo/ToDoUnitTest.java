@@ -17,6 +17,7 @@ import com.example.kromannreumert.todo.service.ToDoService;
 import com.example.kromannreumert.user.entity.Role;
 import com.example.kromannreumert.user.entity.User;
 import com.example.kromannreumert.user.repository.UserRepository;
+import com.example.kromannreumert.exception.customException.http4xxExceptions.toDo.ToDoNotFoundException;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -521,7 +522,7 @@ public class ToDoUnitTest {
 
         when(toDoRepository.findById(todoId)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class,
+        assertThrows(ToDoNotFoundException.class,
                 () -> toDoService.getCaseAssigneesForTodo(todoId));
 
         verify(toDoRepository).findById(todoId);
