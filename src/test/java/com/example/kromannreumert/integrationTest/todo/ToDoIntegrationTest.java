@@ -279,7 +279,7 @@ public class ToDoIntegrationTest {
         mockMvc.perform(patch("/api/v1/todos/{id}/assignees", 9999L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -293,6 +293,6 @@ public class ToDoIntegrationTest {
         mockMvc.perform(patch("/api/v1/todos/{id}/assignees", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isBadRequest());
     }
 }
