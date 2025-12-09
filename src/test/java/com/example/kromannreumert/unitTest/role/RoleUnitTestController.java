@@ -1,5 +1,6 @@
 package com.example.kromannreumert.unitTest.role;
 
+import com.example.kromannreumert.logging.service.LoggingService;
 import com.example.kromannreumert.security.config.SecurityConfig;
 import com.example.kromannreumert.user.controller.RoleController;
 import com.example.kromannreumert.user.dto.RoleRequestDTO;
@@ -42,6 +43,10 @@ public class RoleUnitTestController {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    // Need to add this after global exceptions has been created
+    @MockitoBean
+    private LoggingService loggingService;
 
     private final String baseURL = "/api/v1/role";
 

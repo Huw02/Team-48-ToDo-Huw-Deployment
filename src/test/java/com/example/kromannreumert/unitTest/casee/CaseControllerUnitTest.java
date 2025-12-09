@@ -3,7 +3,8 @@ package com.example.kromannreumert.unitTest.casee;
 import com.example.kromannreumert.casee.controller.CaseController;
 import com.example.kromannreumert.casee.dto.*;
 import com.example.kromannreumert.casee.entity.Casee;
-import com.example.kromannreumert.casee.service.CaseService;
+import com.example.kromannreumert.casee.service.CaseeService;
+import com.example.kromannreumert.logging.service.LoggingService;
 import com.example.kromannreumert.security.config.SecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -34,10 +35,14 @@ public class CaseControllerUnitTest {
     MockMvc mockMvc;
 
     @MockitoBean
-    CaseService caseService;
+    CaseeService caseeService;
 
     @Autowired
     ObjectMapper objectMapper;
+
+    // Need to add this after global exceptions has been created
+    @MockitoBean
+    private LoggingService loggingService;
 
     private final String BASE = "/api/v1/cases";
 
@@ -51,14 +56,14 @@ public class CaseControllerUnitTest {
         casee.setUsers(Collections.emptySet());
         casee.setIdPrefix(100L);
 
-        when(caseService.getAllCases(any(Principal.class)))
+        when(caseeService.getAllCases(any(Principal.class)))
                 .thenReturn(Collections.singletonList(casee));
 
         mockMvc.perform(get(BASE))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Case1"));
 
-        verify(caseService).getAllCases(any(Principal.class));
+        verify(caseeService).getAllCases(any(Principal.class));
     }
 
 
@@ -66,13 +71,13 @@ public class CaseControllerUnitTest {
     @WithMockUser(roles = "JURIST")
     void should_returnAllCases_isOK_forJurist() throws Exception {
 
-        when(caseService.getAllCases(any(Principal.class)))
+        when(caseeService.getAllCases(any(Principal.class)))
                 .thenReturn(Collections.emptyList());
 
         mockMvc.perform(get(BASE))
                 .andExpect(status().isOk());
 
-        verify(caseService).getAllCases(any(Principal.class));
+        verify(caseeService).getAllCases(any(Principal.class));
     }
 
 
@@ -81,7 +86,7 @@ public class CaseControllerUnitTest {
         mockMvc.perform(get(BASE))
                 .andExpect(status().isUnauthorized());
 
-        verify(caseService, never()).getAllCases(any(Principal.class));
+        verify(caseeService, never()).getAllCases(any(Principal.class));
     }
 
     // ===== CREATE CASE =====
@@ -91,7 +96,7 @@ public class CaseControllerUnitTest {
         CaseRequestDTO request = new CaseRequestDTO("New Case", 100L, Set.of(1L, 2L), 1000L, 1);
         CaseResponseDTO response = new CaseResponseDTO("New Case", null, Collections.emptySet(), 1000L, null);
 
-        when(caseService.createCase(eq(request), any(Principal.class))).thenReturn(response);
+        when(caseeService.createCase(eq(request), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(post(BASE)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -99,7 +104,7 @@ public class CaseControllerUnitTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("New Case"));
 
-        verify(caseService).createCase(eq(request), any(Principal.class));
+        verify(caseeService).createCase(eq(request), any(Principal.class));
     }
 
     @Test
@@ -112,7 +117,7 @@ public class CaseControllerUnitTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isForbidden());
 
-        verify(caseService, never()).createCase(any(CaseRequestDTO.class), any(Principal.class));
+        verify(caseeService, never()).createCase(any(CaseRequestDTO.class), any(Principal.class));
     }
 
     @Test
@@ -124,7 +129,7 @@ public class CaseControllerUnitTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized());
 
-        verify(caseService, never()).createCase(any(CaseRequestDTO.class), any(Principal.class));
+        verify(caseeService, never()).createCase(any(CaseRequestDTO.class), any(Principal.class));
     }
 
     // ===== UPDATE CASE =====
@@ -134,7 +139,7 @@ public class CaseControllerUnitTest {
         CaseUpdateRequest request = new CaseUpdateRequest(1L, "Updated Case", 2000L, "testAdmin", Set.of(2, 3));
         CaseResponseDTO response = new CaseResponseDTO("Updated Case", null, Collections.emptySet(), 2000L, null);
 
-        when(caseService.updateCase(eq(request), any(Principal.class))).thenReturn(response);
+        when(caseeService.updateCase(eq(request), any(Principal.class))).thenReturn(response);
 
         mockMvc.perform(put(BASE)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -142,7 +147,7 @@ public class CaseControllerUnitTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Updated Case"));
 
-        verify(caseService).updateCase(eq(request), any(Principal.class));
+        verify(caseeService).updateCase(eq(request), any(Principal.class));
     }
 
     @Test
@@ -154,7 +159,7 @@ public class CaseControllerUnitTest {
 
         // mock is not actually needed because service should not be called,
         // but we include it to mimic the ClientController test structure.
-        when(caseService.updateCase(eq(dto), any(Principal.class)))
+        when(caseeService.updateCase(eq(dto), any(Principal.class)))
                 .thenReturn(null);
 
         mockMvc.perform(
@@ -164,7 +169,7 @@ public class CaseControllerUnitTest {
                 )
                 .andExpect(status().isForbidden());
 
-        verify(caseService, never())
+        verify(caseeService, never())
                 .updateCase(any(CaseUpdateRequest.class), any(Principal.class));
     }
 
@@ -178,7 +183,7 @@ public class CaseControllerUnitTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized());
 
-        verify(caseService, never()).updateCase(any(CaseUpdateRequest.class), any(Principal.class));
+        verify(caseeService, never()).updateCase(any(CaseUpdateRequest.class), any(Principal.class));
     }
 
     // ===== DELETE CASE =====
@@ -187,7 +192,7 @@ public class CaseControllerUnitTest {
     void should_deleteCase_isOK_forAuthorizedRoles() throws Exception {
         CaseDeleteRequestDTO request = new CaseDeleteRequestDTO(100L);
 
-        when(caseService.deleteCase(eq(request), any(Principal.class))).thenReturn("Case deleted successfully");
+        when(caseeService.deleteCase(eq(request), any(Principal.class))).thenReturn("Case deleted successfully");
 
         mockMvc.perform(delete(BASE)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -195,7 +200,7 @@ public class CaseControllerUnitTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("Case deleted successfully"));
 
-        verify(caseService).deleteCase(eq(request), any(Principal.class));
+        verify(caseeService).deleteCase(eq(request), any(Principal.class));
     }
 
     @Test
@@ -208,7 +213,7 @@ public class CaseControllerUnitTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isForbidden());
 
-        verify(caseService, never()).deleteCase(any(CaseDeleteRequestDTO.class), any(Principal.class));
+        verify(caseeService, never()).deleteCase(any(CaseDeleteRequestDTO.class), any(Principal.class));
     }
 
     @Test
@@ -220,6 +225,6 @@ public class CaseControllerUnitTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized());
 
-        verify(caseService, never()).deleteCase(any(CaseDeleteRequestDTO.class), any(Principal.class));
+        verify(caseeService, never()).deleteCase(any(CaseDeleteRequestDTO.class), any(Principal.class));
     }
 }

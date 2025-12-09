@@ -22,7 +22,7 @@ public class Logging {
     @Enumerated(EnumType.STRING)
     private LogAction action;
 
-    @Column(columnDefinition = "TEXT")
+    @Lob
     private String details;
 
     private LocalDateTime timestamp = LocalDateTime.now();

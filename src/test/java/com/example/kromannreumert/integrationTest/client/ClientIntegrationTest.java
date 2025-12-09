@@ -3,7 +3,6 @@ package com.example.kromannreumert.integrationTest.client;
 import com.example.kromannreumert.client.DTO.ClientRequestDTO;
 import com.example.kromannreumert.client.DTO.UpdateClientIdPrefixDTO;
 import com.example.kromannreumert.client.DTO.UpdateClientNameDTO;
-import com.example.kromannreumert.user.entity.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
@@ -12,12 +11,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Set;
 
-    import static org.mockito.Mockito.*;
     import static org.junit.jupiter.api.Assertions.*;
     import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
     import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -246,16 +245,14 @@ public class ClientIntegrationTest {
     }
 
     @Test
+    @WithMockUser(roles = {"ADMIN", "PARTNER", "SAGSBEHANDLER"})
     void should_not_updateClientName_with_authorizedUsers_ifNameIsTheSame() throws Exception {
         var DTO = new UpdateClientNameDTO("Kromann Reumert", "Kromann Reumert");
-        String[] authorizedRoles = {"ADMIN", "SAGSBEHANDLER", "PARTNER"};
-        for (String roles : authorizedRoles) {
-            mockMvc.perform(patch(BASEURL + "/update/name").with(user("ADMIN").roles(roles))
+            mockMvc.perform(patch(BASEURL + "/update/name")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(DTO)))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$").value("Cannot update the same name"));
-        }
+                            .andExpect(status().isConflict())
+                            .andExpect(jsonPath("$.message").value("Client conflict: Attempted to update name with same value"));
     }
 
     @Test
@@ -276,14 +273,12 @@ public class ClientIntegrationTest {
     }
 
     @Test
+    @WithMockUser(roles = {"ADMIN", "PARTNER", "SAGSBEHANDLER"})
     void should_return_deletedClient_for_AuthorizedUsers() throws Exception{
-        String [] authorizedRoles = {"ADMIN", "SAGSBEHANDLER", "PARTNER"};
-        for(String roles : authorizedRoles)
-        {
-            mockMvc.perform(delete(BASEURL + "delete/1").with(user("ADMIN").roles(roles)))
+
+            mockMvc.perform(delete(BASEURL + "delete/1"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$").value("Client with id: 1 has been deleted"));
-        }
     }
 
 

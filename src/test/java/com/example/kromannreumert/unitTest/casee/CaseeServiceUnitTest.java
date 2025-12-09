@@ -7,9 +7,10 @@ import com.example.kromannreumert.casee.dto.CaseUpdateRequest;
 import com.example.kromannreumert.casee.entity.Casee;
 import com.example.kromannreumert.casee.mapper.CaseMapper;
 import com.example.kromannreumert.casee.repository.CaseRepository;
-import com.example.kromannreumert.casee.service.CaseService;
+import com.example.kromannreumert.casee.service.CaseeService;
 import com.example.kromannreumert.client.entity.Client;
 import com.example.kromannreumert.client.repository.ClientRepository;
+import com.example.kromannreumert.exception.customException.http4xxExceptions.casee.CaseNotFoundException;
 import com.example.kromannreumert.logging.entity.LogAction;
 import com.example.kromannreumert.logging.service.LoggingService;
 import com.example.kromannreumert.user.entity.User;
@@ -17,7 +18,6 @@ import com.example.kromannreumert.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -32,10 +32,10 @@ import static org.mockito.Mockito.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @ExtendWith(MockitoExtension.class)
-public class CaseServiceUnitTest {
+public class CaseeServiceUnitTest {
 
     @InjectMocks
-    CaseService caseService;
+    CaseeService caseeService;
 
     @Mock
     CaseRepository caseRepository;
@@ -80,7 +80,7 @@ public class CaseServiceUnitTest {
         Casee c2 = new Casee();
         when(caseRepository.findAll()).thenReturn(List.of(c1, c2));
 
-        List<Casee> result = caseService.getAllCases(principal);
+        List<Casee> result = caseeService.getAllCases(principal);
 
         assertThat(result).hasSize(2);
         verify(caseRepository, times(1)).findAll();
@@ -99,7 +99,7 @@ public class CaseServiceUnitTest {
         Casee assignedCase = new Casee();
         when(caseRepository.findDistinctByUsers_UserId(4L)).thenReturn(List.of(assignedCase));
 
-        List<Casee> result = caseService.getAllCases(principal);
+        List<Casee> result = caseeService.getAllCases(principal);
         assertThat(result).hasSize(1);
         verify(caseRepository).findDistinctByUsers_UserId(4L);
     }
@@ -109,14 +109,14 @@ public class CaseServiceUnitTest {
     void getCaseByName_returnsCase() {
         Casee c = new Casee();
         when(caseRepository.findAllByName("Contract")).thenReturn(Optional.of(c));
-        Casee result = caseService.getCaseByName("Contract");
+        Casee result = caseeService.getCaseByName("Contract");
         assertThat(result).isEqualTo(c);
     }
 
     @Test
     void getCaseByName_throwsIfNotFound() {
         when(caseRepository.findAllByName("Missing")).thenReturn(Optional.empty());
-        assertThrows(RuntimeException.class, () -> caseService.getCaseByName("Missing"));
+        assertThrows(RuntimeException.class, () -> caseeService.getCaseByName("Missing"));
     }
 
     // --------- createCase ---------
@@ -135,7 +135,7 @@ public class CaseServiceUnitTest {
         when(userRepository.findById(2)).thenReturn(Optional.of(assignee));
         when(userRepository.findById(2)).thenReturn(Optional.of(responsible));
 
-        CaseResponseDTO response = caseService.createCase(dto, principal);
+        CaseResponseDTO response = caseeService.createCase(dto, principal);
 
         assertThat(response.name()).isEqualTo("New Case");
         verify(caseRepository).save(any(Casee.class));
@@ -169,7 +169,7 @@ public class CaseServiceUnitTest {
 
         when(principal.getName()).thenReturn("admin");
 
-        CaseResponseDTO response = caseService.updateCase(dto, principal);
+        CaseResponseDTO response = caseeService.updateCase(dto, principal);
 
         assertThat(response.name()).isEqualTo("Updated Case");
         verify(caseRepository).save(existing);
@@ -187,7 +187,7 @@ public class CaseServiceUnitTest {
         when(caseRepository.findById(1L)).thenReturn(Optional.of(existing));
         when(principal.getName()).thenReturn("admin");
 
-        String result = caseService.deleteCase(dto, principal);
+        String result = caseeService.deleteCase(dto, principal);
 
         assertThat(result).isEqualTo("Case deleted successfully");
         verify(caseRepository).delete(existing);
@@ -199,7 +199,7 @@ public class CaseServiceUnitTest {
         CaseDeleteRequestDTO dto = new CaseDeleteRequestDTO(1L);
         when(caseRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> caseService.deleteCase(dto, principal));
+        assertThrows(CaseNotFoundException.class, () -> caseeService.deleteCase(dto, principal));
     }
 
 }

@@ -1,5 +1,6 @@
 package com.example.kromannreumert.unitTest.user;
 
+import com.example.kromannreumert.logging.service.LoggingService;
 import com.example.kromannreumert.security.config.SecurityConfig;
 import com.example.kromannreumert.user.controller.UserController;
 import com.example.kromannreumert.user.dto.UserRequestDTO;
@@ -45,6 +46,9 @@ public class UserUnitTestController {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    @MockitoBean
+    private LoggingService loggingService;
 
     private final String baseURL = "/api/v1/user";
 

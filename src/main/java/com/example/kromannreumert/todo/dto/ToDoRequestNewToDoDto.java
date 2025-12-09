@@ -7,6 +7,7 @@ import java.time.LocalDate;
 public record ToDoRequestNewToDoDto(
         String name,
         String description,
+        Long caseId,
         LocalDate startDate,
         LocalDate endDate,
         Priority priority

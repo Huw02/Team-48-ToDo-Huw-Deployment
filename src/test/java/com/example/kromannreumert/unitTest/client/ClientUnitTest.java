@@ -53,7 +53,7 @@ public class ClientUnitTest {
         // ARRANGE
         Long idPrefix = 1000L;
         String clientName = "ClientTestName";
-        Client createClient = new Client(1L, clientName, null, idPrefix);
+        Client createClient = new Client(1L, clientName, Set.of(), idPrefix);
         ClientResponeDTO convert = new ClientResponeDTO(1L, clientName, null, idPrefix);
 
         when(clientRepository.findAll()).thenReturn(List.of(createClient));
@@ -70,7 +70,7 @@ public class ClientUnitTest {
         assertEquals(createClient.getIDPrefix(), result.getFirst().idPrefix());
         verify(clientRepository).findAll();
         verify(clientMapper).toClientDTO(createClient);
-        verify(loggingService).log(eq(LogAction.VIEW_ALL_CLIENTS), eq("Abdi"), contains("fetched all clients successfully"));
+        verify(loggingService).log(eq(LogAction.VIEW_ALL_CLIENTS), eq("Abdi"), eq("Fetched all clients"));
 
     }
 
@@ -98,7 +98,7 @@ public class ClientUnitTest {
         assertEquals(createClient.getIDPrefix(), result.idPrefix());
         verify(clientRepository).getClientByIDPrefix(idPrefix);
         verify(clientMapper).toClientDTO(createClient);
-        verify(loggingService).log(eq(LogAction.VIEW_ONE_CLIENT), eq("Tester"), contains("id prefix"));
+        verify(loggingService).log(eq(LogAction.VIEW_ONE_CLIENT), eq("Tester"), eq("Viewed client with prefix: " + idPrefix));
     }
 
     @Test
@@ -107,7 +107,7 @@ public class ClientUnitTest {
         // ARRANGE
         Long idPrefix = 1000L;
         String clientName = "ClientTestName";
-        Client createClient = new Client(1L, clientName, null, idPrefix);
+        Client createClient = new Client(1L, clientName, Set.of(), idPrefix);
         ClientResponeDTO convertClient = new ClientResponeDTO(createClient.getId(), createClient.getName(), null, createClient.getIDPrefix());
 
         when(clientRepository.findClientByName(clientName)).thenReturn(Optional.of(createClient));
@@ -140,7 +140,7 @@ public class ClientUnitTest {
         User createUser = new User(1L,"TestUser", "Test", "Test@1234", "1234", null, null);
         Set<String> users = Set.of(createUser.getUsername());
         ClientRequestDTO createClient = new ClientRequestDTO(clientName, users, idPrefix);
-        Client convertDTOToClient = new Client(null, createClient.clientName(), null, createClient.idPrefix());
+        Client convertDTOToClient = new Client(null, createClient.clientName(), Set.of(), createClient.idPrefix());
 
         when(clientRepository.save(any(Client.class))).thenReturn(convertDTOToClient);
         when(userRepository.findByUsername("TestUser")).thenReturn(Optional.of(createUser));
@@ -164,7 +164,7 @@ public class ClientUnitTest {
 
         // ARRANGE
         UpdateClientNameDTO updateName = new UpdateClientNameDTO("hi", "UpdatedClientName");
-        Client oldClient = new Client(1L, updateName.oldName(), null, null);
+        Client oldClient = new Client(1L, updateName.oldName(), Set.of(), null);
         Client updatedClient = new Client (oldClient.getId(), updateName.newName(), oldClient.users, oldClient.getIDPrefix());
 
         when(clientRepository.findClientByName(oldClient.getName())).thenReturn(Optional.of(oldClient));
@@ -211,13 +211,9 @@ public class ClientUnitTest {
         assertEquals(result, "Successfully updated client with: " + updateID.idPrefix());
         verify(clientRepository).findClientByName(clientName);
         verify(clientRepository).save(any(Client.class));
-        verify(loggingService).log(eq(LogAction.UPDATE_CLIENT), eq("Updater"), contains(clientName));
+        verify(loggingService).log(eq(LogAction.UPDATE_CLIENT), eq("Updater"), eq("Updated client prefix"));
     }
 
-    @Test
-    void should_update_client_userList() {
-        // TODO: Add updateClientUserList test
-    }
 
     @Test
     void should_delete_client() {
@@ -228,6 +224,7 @@ public class ClientUnitTest {
         Long id = 1L;
         Client client = new Client(id, clientName, Set.of(), idPrefix);
 
+        when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
         doNothing().when(clientRepository).deleteById(id);
 
         // ACT
@@ -239,6 +236,7 @@ public class ClientUnitTest {
         assertEquals(result, expectedResult);
         verify(clientRepository).deleteById(id);
         verify(loggingService).log(eq(LogAction.DELETE_CLIENT), eq("Remover"), contains(id.toString()));
+        verify(clientRepository).findById(id);
     }
 
 

@@ -1,6 +1,5 @@
 package com.example.kromannreumert.security.controller;
 
-import com.example.kromannreumert.exception.customException.UserUnauthorizedException;
 import com.example.kromannreumert.security.dto.JwtResponseDTO;
 import com.example.kromannreumert.security.dto.LoginDTO;
 import com.example.kromannreumert.user.dto.UserMeResponseDTO;
@@ -17,8 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.security.Principal;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/auth")
@@ -45,7 +42,7 @@ public class AuthorizeController {
         } catch (Exception e) {
             log.error("Controller: It was not possible to sign the user in {}", loginRequest.username());
             log.error("Login failed due to: {}", e.getMessage());
-            throw new UserUnauthorizedException();
+            throw new RuntimeException(e);
         }
     }
 
@@ -53,17 +50,6 @@ public class AuthorizeController {
     ADD @PreAuthorize("hasRole('ADMIN')") when we are ready for it. It sets security on method level, so if someone access it with
     an unauthorized jwt token they will get denied
      */
-    @PostMapping("/create")
-    public ResponseEntity<?> createAccount(@RequestBody User user, Principal principal) {
-        try {
-            log.info("User created controller accessed by {}", user.getName());
-            String test = userService.createUser(user, principal.getName());
-            return ResponseEntity.ok(test);
-        } catch (RuntimeException e) {
-            log.error("Could not create user {}", user.getName());
-            return new ResponseEntity<>("Could not create user",HttpStatus.BAD_REQUEST);
-        }
-    }
 
     @GetMapping("/me")
     public ResponseEntity<UserMeResponseDTO> getCurrentUser(Principal principal) {

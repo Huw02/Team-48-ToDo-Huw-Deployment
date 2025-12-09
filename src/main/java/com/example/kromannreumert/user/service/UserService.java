@@ -2,11 +2,15 @@ package com.example.kromannreumert.user.service;
 
 import com.example.kromannreumert.logging.entity.LogAction;
 import com.example.kromannreumert.logging.service.LoggingService;
+import com.example.kromannreumert.exception.customException.http4xxExceptions.ApiBusinessException;
+import com.example.kromannreumert.exception.customException.http4xxExceptions.UserNotFoundException;
+import com.example.kromannreumert.exception.customException.http5xxException.ActionFailedException;
 import com.example.kromannreumert.user.dto.UserRequestDTO;
 import com.example.kromannreumert.user.dto.UserResponseDTO;
 import com.example.kromannreumert.user.entity.Role;
 import com.example.kromannreumert.user.entity.User;
 import com.example.kromannreumert.user.mapper.UserMapper;
+import com.example.kromannreumert.user.repository.RoleRepository;
 import com.example.kromannreumert.user.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -29,13 +34,15 @@ public class UserService implements UserDetailsService {
     private final static Logger log = LoggerFactory.getLogger(UserService.class);
     private final UserMapper userMapper;
     private final RoleService roleService;
+    private final RoleRepository roleRepository;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, LoggingService loggingService, UserMapper userMapper, RoleService roleService) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, LoggingService loggingService, UserMapper userMapper, RoleService roleService, RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.loggingService = loggingService;
         this.userMapper = userMapper;
         this.roleService = roleService;
+        this.roleRepository = roleRepository;
     }
 
     @Override
@@ -58,30 +65,44 @@ public class UserService implements UserDetailsService {
                 .build();
     }
 
-    public String createUser(User user, String name) {
+    public UserResponseDTO createUser(UserRequestDTO userRequestDTO, String performedAct){
         try {
+            Optional<UserRequestDTO> request = Optional.of(userRequestDTO);
 
-            log.info("Trying to create user {}", user.getName());
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            log.info("Successfully encrypted password {}", user.getName());
-            userRepository.save(user);
-            log.info("Successfully created {}", user.getName());
-            loggingService.log(LogAction.CREATE_USER,name,"Created new user: " + user.getName());
+            User user = request.stream().
+                    map(userMapper::toUser).
+                    toList().getFirst();
 
-            return "User created: " + user.getName();
+            User userFromDb = userRepository.save(user);
 
-        } catch (RuntimeException e) {
+            UserResponseDTO response = userMapper.toUserResponseDTO(userFromDb);
 
-            log.error("Could not create user");
-            loggingService.log(LogAction.CREATE_USER_FAILED,name,"Created new user failed: " + user.getName());
-            throw new RuntimeException("Could not create user");
+            loggingService.log(LogAction.CREATE_USER, performedAct, "Created a user: " + response);
 
+            return response;
+        }catch(RuntimeException e){
+            loggingService.log(LogAction.CREATE_USER_FAILED, performedAct, "Tried to create a user: " + userRequestDTO);
+            throw new RuntimeException("Failed to create a new user");
         }
     }
 
     public User findUserByUsername(String username) {
         log.info("Service: Trying to find user by username {}", username);
         return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+    }
+
+    public UserResponseDTO getUserByUsername(String username){
+        try {
+            Optional<User> user = userRepository.findByUsername(username);
+
+            return user.stream()
+                    .map(userMapper::toUserResponseDTO)
+                    .toList().getFirst();
+
+        } catch(RuntimeException e){
+            if (e instanceof ApiBusinessException) throw e;
+            throw new ActionFailedException(LogAction.VIEW_ONE_USER_FAILED, username, e);
+        }
     }
 
     public List<UserResponseDTO>getAllUsers(String name){
@@ -92,11 +113,12 @@ public class UserService implements UserDetailsService {
                     .map(userMapper::toUserResponseDTO)
                     .toList();
 
-            loggingService.log(LogAction.VIEW_ALL_USERS, name, "Viewed all users");
+            loggingService.log(LogAction.VIEW_ALL_USERS, name, "Viewed all users, the user found: " + dtoList.size() + " users in the system");
             return dtoList;
         } catch(RuntimeException e){
             loggingService.log(LogAction.VIEW_ALL_USERS_FAILED, name, "Failed to view all users");
-            throw new RuntimeException("Could not load all users");
+            if (e instanceof ApiBusinessException) throw e;
+            throw new ActionFailedException(LogAction.VIEW_ALL_USERS_FAILED, name, e);
         }
     }
 
@@ -112,39 +134,46 @@ public class UserService implements UserDetailsService {
 
         } catch(RuntimeException e){
             loggingService.log(LogAction.VIEW_ONE_USER_FAILED, name, "Failed to view one user with id: " + id);
-            throw new RuntimeException("Could not load user" + id);
+            if (e instanceof ApiBusinessException) throw e;
+            throw new ActionFailedException(LogAction.VIEW_ONE_USER_FAILED, name, e);
         }
     }
 
-    public UserResponseDTO updateUser(int userId, UserRequestDTO userRequestDTO, String name){
+    public UserResponseDTO updateUser(int userId, UserRequestDTO dto, String name) {
         try {
-            //laver vores request om til en optional, for at kunne stream den
-            Optional<UserRequestDTO> dto = Optional.of(userRequestDTO);
+            User userToUpdate = userRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
-            //laver vores request user om til en user
-            User user = dto.stream()
-                    .map(userMapper::toUser).toList().getFirst();
+            if (dto.username() != null)
+                userToUpdate.setUsername(dto.username());
 
-            //sætter user id så den bliver opdateret
-            user.setUserId(Integer.valueOf(userId).longValue());
+            if (dto.name() != null)
+                userToUpdate.setName(dto.name());
 
-            //opdatere brugeren i db
-            userRepository.save(user);
+            if (dto.email() != null)
+                userToUpdate.setEmail(dto.email());
 
-            //henter den nye bruger fra db
-            Optional<User>getUserFromDb = userRepository.findById(userId);
+            if (dto.password() != null)
+                userToUpdate.setPassword(passwordEncoder.encode(dto.password()));
 
-            //laver ny bruger om til en response
-            UserResponseDTO userResponse = getUserFromDb.stream().map(userMapper::toUserResponseDTO).toList().getFirst();
+            if (dto.roleId() != 0) {
+                Role role = roleRepository.findById(dto.roleId())
+                        .orElseThrow(() -> new RuntimeException("Role not found"));
+                userToUpdate.setRoles(new java.util.HashSet<>(Set.of(role)));
+            }
+            userRepository.save(userToUpdate);
 
-            //logger handlingerne
-            loggingService.log(LogAction.UPDATE_USER, name, "Updated user with user id: " + userId + ", new user is" + user);
+            loggingService.log(
+                    LogAction.UPDATE_USER,
+                    name,
+                    "Updated user with user id: " + userId + ", new user is " + userToUpdate
+            );
+            return userMapper.toUserResponseDTO(userToUpdate);
 
-            //retunerer user
-            return userResponse;
-        }catch(RuntimeException e){
+        } catch(RuntimeException e){
             loggingService.log(LogAction.UPDATE_USER_FAILED, name, "Failed to update user, with user id:" + userId);
-            throw new RuntimeException("Could not update user");
+            if (e instanceof ApiBusinessException) throw e;
+            throw new ActionFailedException(LogAction.UPDATE_USER_FAILED, name, e);
         }
     }
 
@@ -154,7 +183,7 @@ public class UserService implements UserDetailsService {
             loggingService.log(LogAction.DELETE_USER, name, "Deleted user with user Id: " + userId);
         }catch(RuntimeException e){
             loggingService.log(LogAction.DELETE_USER_FAILED, name, "Failed to delete user, with user id: " + userId);
-            throw new RuntimeException("Could not delete user: " + userId);
+            throw new ActionFailedException(LogAction.DELETE_USER_FAILED, name, e);
         }
     }
 

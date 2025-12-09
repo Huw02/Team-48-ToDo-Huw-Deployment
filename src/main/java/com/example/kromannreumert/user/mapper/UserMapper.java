@@ -5,6 +5,7 @@ import com.example.kromannreumert.user.dto.UserResponseDTO;
 import com.example.kromannreumert.user.entity.Role;
 import com.example.kromannreumert.user.entity.User;
 import com.example.kromannreumert.user.service.RoleService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
@@ -13,20 +14,24 @@ import java.util.Set;
 public class UserMapper {
 
     private final RoleService roleService;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserMapper(RoleService roleService) {
+    public UserMapper(RoleService roleService, PasswordEncoder passwordEncoder) {
         this.roleService = roleService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public User toUser(UserRequestDTO userRequestDTO){
         Role role = roleService.getRoleById(userRequestDTO.roleId());
-        Set<Role>roles = Set.of(role);
+        Set<Role>roles = new java.util.HashSet<>(Set.of(role));
+
+
 
         User user = new User();
         user.setUsername(userRequestDTO.username());
         user.setName(userRequestDTO.name());
         user.setEmail(userRequestDTO.email());
-        user.setPassword(userRequestDTO.password());
+        user.setPassword(passwordEncoder.encode(userRequestDTO.password()));
         user.setRoles(roles);
 
         return user;

@@ -1,16 +1,15 @@
 package com.example.kromannreumert.todo.controller;
 
-import com.example.kromannreumert.todo.dto.ToDoRequestDto;
-import com.example.kromannreumert.todo.dto.ToDoRequestNewToDoDto;
-import com.example.kromannreumert.todo.dto.ToDoResponseDto;
+import com.example.kromannreumert.todo.dto.*;
 import com.example.kromannreumert.todo.service.ToDoService;
-import org.springframework.http.HttpStatus;
+import com.example.kromannreumert.user.entity.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.security.Principal;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("api/v1")
@@ -25,73 +24,60 @@ public class ToDoController {
 
     @GetMapping("/todos")
     public ResponseEntity<List<ToDoResponseDto>> findAll(Principal principal) {
-        try {
             List<ToDoResponseDto> responseDtos = toDoService.findAll(principal.getName());
             return ResponseEntity.ok(responseDtos);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
     }
 
     @GetMapping("/todos/assigned")
     public ResponseEntity<List<ToDoResponseDto>> findAssigned(Principal principal) {
-        try {
-            List<ToDoResponseDto> responseDtos = toDoService.findAssignedToUser(principal.getName());
-            return ResponseEntity.ok(responseDtos);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        List<ToDoResponseDto> responseDtos = toDoService.findAssignedToUser(principal.getName());
+        return ResponseEntity.ok(responseDtos);
+    }
+
+    @GetMapping("/todos/{id}/case-assignees")
+    public ResponseEntity<Set<User>> getCaseAssigneesForTodo(@PathVariable Long id) {
+        Set<User> users = toDoService.getCaseAssigneesForTodo(id);
+        return ResponseEntity.ok(users);
+    }
+
+    @PatchMapping("/todos/{id}/assignees")
+    public ResponseEntity<ToDoResponseDto> updateAssignees(
+            @PathVariable Long id,
+            @RequestBody ToDoAssigneeUpdateRequest request,
+            Principal principal
+    ) {
+        ToDoResponseDto updated = toDoService.updateAssignees(id, request, principal.getName());
+        return ResponseEntity.ok(updated);
     }
 
     @GetMapping("/todos/{id}")
     public ResponseEntity<ToDoResponseDto> findById(@PathVariable Long id, Principal principal) {
-        try {
-            ToDoResponseDto responseDto = toDoService.findToDoById(principal.getName(),id);
-            return ResponseEntity.ok(responseDto);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        ToDoResponseDto responseDto = toDoService.findToDoById(principal.getName(),id);
+        return ResponseEntity.ok(responseDto);
     }
 
     @PostMapping("/todos")
     public ResponseEntity<ToDoResponseDto> createToDo(@RequestBody ToDoRequestNewToDoDto todoRequestDto, Principal principal) {
-        try {
-            ToDoResponseDto responseDto = toDoService.createToDo(principal.getName(), todoRequestDto);
-            URI location = URI.create("/todos" + responseDto.id());
-            return ResponseEntity.created(location).body(responseDto);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+        ToDoResponseDto responseDto = toDoService.createToDo(principal.getName(), todoRequestDto);
+        URI location = URI.create("/todos" + responseDto.id());
+        return ResponseEntity.created(location).body(responseDto);
     }
 
     @DeleteMapping("/todos/{id}")
     public ResponseEntity<Void> deleteToDo(@PathVariable Long id, Principal principal) {
-        try {
-            toDoService.deleteTodo(principal.getName(),id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        toDoService.deleteTodo(principal.getName(),id);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/todos/{id}")
     public ResponseEntity<ToDoResponseDto> updateTodo(@PathVariable Long id, @RequestBody ToDoRequestDto todoRequestDto, Principal principal) {
-        try {
-            ToDoResponseDto toDoResponseDto = toDoService.updateTodo(id, principal.getName(), todoRequestDto);
-            return ResponseEntity.ok(toDoResponseDto);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+        ToDoResponseDto toDoResponseDto = toDoService.updateTodo(id, principal.getName(), todoRequestDto);
+        return ResponseEntity.ok(toDoResponseDto);
     }
 
     @GetMapping("/todos/size")
     public ResponseEntity<Integer> getToDoSize() {
-        try {
-            Integer toDoSize = toDoService.getToDoSize();
-            return ResponseEntity.ok(toDoSize);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-
-        }
+        Integer toDoSize = toDoService.getToDoSize();
+        return ResponseEntity.ok(toDoSize);
     }
 }

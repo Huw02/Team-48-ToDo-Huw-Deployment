@@ -4,6 +4,7 @@ import com.example.kromannreumert.casee.dto.CaseDeleteRequestDTO;
 import com.example.kromannreumert.casee.dto.CaseRequestDTO;
 import com.example.kromannreumert.casee.dto.CaseUpdateRequest;
 import com.example.kromannreumert.client.repository.ClientRepository;
+import com.example.kromannreumert.logging.service.LoggingService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;

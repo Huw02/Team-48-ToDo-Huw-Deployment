@@ -109,6 +109,13 @@ public class UserIntegrationTest {
                 .andExpect(jsonPath("$").value(4));
     }
 
+    @Test
+    void getUserByUsername()throws Exception{
+        mockMvc.perform(get(baseUrl + "/singleUser/admin").with(user("ADMIN").roles("ADMIN")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.userId").value(1));
+    }
+
 
 
 }

@@ -1,8 +1,10 @@
 package com.example.kromannreumert.user.service;
 
 import com.example.kromannreumert.logging.entity.LogAction;
-import com.example.kromannreumert.logging.entity.Logging;
 import com.example.kromannreumert.logging.service.LoggingService;
+import com.example.kromannreumert.exception.customException.http4xxExceptions.ApiBusinessException;
+import com.example.kromannreumert.exception.customException.http4xxExceptions.role.RoleNotFoundException;
+import com.example.kromannreumert.exception.customException.http5xxException.ActionFailedException;
 import com.example.kromannreumert.user.dto.RoleRequestDTO;
 import com.example.kromannreumert.user.dto.RoleResponseDTO;
 import com.example.kromannreumert.user.entity.Role;
@@ -43,7 +45,8 @@ public class RoleService {
 
             loggingService.log(LogAction.VIEW_ALL_ROLES_FAILED, name, "Failed to view all roles");
 
-            throw new RuntimeException("could not view the roles");
+            if (e instanceof ApiBusinessException) throw e;
+            throw new ActionFailedException(LogAction.VIEW_ALL_ROLES_FAILED, name, e);
         }
     }
 
@@ -61,13 +64,18 @@ public class RoleService {
             return dtoList.getFirst();
         } catch (RuntimeException e) {
             loggingService.log(LogAction.VIEW_ONE_ROLE_FAILED, name, "Failed to view one role");
-            throw new RuntimeException("could not get role by role id");
+            if (e instanceof ApiBusinessException) throw e;
+            throw new ActionFailedException(LogAction.VIEW_ONE_ROLE_FAILED, name, e);
         }
     }
     //nedenstående er til usermapper
     public Role getRoleById(int id){
         Optional<Role> role = roleRepository.findById(id);
-        return role.get();
+        return role.orElseThrow(() -> new RoleNotFoundException(
+                LogAction.VIEW_ONE_ROLE_FAILED,
+                null,
+                "id=" + id
+        ));
     }
 
     public RoleResponseDTO createRole(RoleRequestDTO roleRequestDTO, String name) {
@@ -86,7 +94,8 @@ public class RoleService {
             );
         } catch (RuntimeException e) {
             loggingService.log(LogAction.CREATE_ROLE_FAILED, name, "Failed to create role: " + roleRequestDTO.roleName());
-            throw new RuntimeException("Could not create role");
+            if (e instanceof ApiBusinessException) throw e;
+            throw new ActionFailedException(LogAction.CREATE_ROLE_FAILED, name, e);
         }
     }
 
@@ -107,7 +116,8 @@ public class RoleService {
             );
         } catch (RuntimeException e) {
             loggingService.log(LogAction.UPDATE_ROLE_FAILED, name, "Failed to update role with roleId: " + roleId);
-            throw new RuntimeException("could not update role");
+            if (e instanceof ApiBusinessException) throw e;
+            throw new ActionFailedException(LogAction.UPDATE_ROLE_FAILED, name, e);
         }
     }
 
@@ -118,6 +128,7 @@ public class RoleService {
             loggingService.log(LogAction.DELETE_ROLE, name, "Deleted role with role id: " + roleId);
         } catch (RuntimeException e) {
             loggingService.log(LogAction.DELETE_ROLE_FAILED, name, "Failed to delete role with role id: " + roleId);
+            throw new ActionFailedException(LogAction.DELETE_ROLE_FAILED, name, e);
         }
     }
 }
