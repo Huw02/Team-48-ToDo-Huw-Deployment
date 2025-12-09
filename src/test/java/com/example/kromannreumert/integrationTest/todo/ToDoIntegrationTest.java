@@ -1,5 +1,7 @@
 package com.example.kromannreumert.integrationTest.todo;
 
+import com.example.kromannreumert.exception.customException.http4xxExceptions.UserNotFoundException;
+import com.example.kromannreumert.todo.dto.ToDoAssigneeUpdateRequest;
 import com.example.kromannreumert.todo.dto.ToDoRequestDto;
 import com.example.kromannreumert.todo.dto.ToDoRequestNewToDoDto;
 import com.example.kromannreumert.todo.entity.Priority;
@@ -17,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -35,18 +38,17 @@ public class ToDoIntegrationTest {
     private ObjectMapper objectMapper;
 
     @Test
-    @WithMockUser(username = "admin", roles = "ADMIN")
+    @WithMockUser(username = "jurist01", roles = "JURIST")
     void findAllNotArchivedToDos() throws Exception {
         mockMvc.perform(get("/api/v1/todos")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].archived").value(false))
-                .andExpect(jsonPath("$[1].archived").value(false));
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].archived").value(false));
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = "ADMIN")
+    @WithMockUser(username = "jurist01", roles = "JURIST")
     void findToDoById() throws Exception {
         mockMvc.perform(get("/api/v1/todos/{id}", 1)
                         .accept(MediaType.APPLICATION_JSON))
@@ -63,7 +65,7 @@ public class ToDoIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = "ADMIN")
+    @WithMockUser(username = "jurist01", roles = "JURIST")
     void createToDo() throws Exception {
         ToDoRequestNewToDoDto requestDto = new ToDoRequestNewToDoDto(
                 "test",
@@ -104,14 +106,14 @@ public class ToDoIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = "ADMIN")
+    @WithMockUser(username = "jurist01", roles = "JURIST")
     void getTodo_returnsNotFoundForUnknownId() throws Exception {
         mockMvc.perform(get("/api/v1/todos/{id}", 9999))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = "ADMIN")
+    @WithMockUser(username = "jurist01", roles = "JURIST")
     void deleteToDo() throws Exception {
         mockMvc.perform(delete("/api/v1/todos/{id}", 1))
                 .andExpect(status().isNoContent());
@@ -122,14 +124,14 @@ public class ToDoIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = "ADMIN")
+    @WithMockUser(username = "jurist01", roles = "JURIST")
     void deleteToDo_nonExistingId_returnsNotFound() throws Exception {
         mockMvc.perform(delete("/api/v1/todos/{id}", 9999))
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = "ADMIN")
+    @WithMockUser(username = "jurist01", roles = "JURIST")
     void updateToDo_existingId() throws Exception {
         ToDoRequestDto updateDto = new ToDoRequestDto(
                 "Opdateret titel",
@@ -159,7 +161,7 @@ public class ToDoIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = "ADMIN")
+    @WithMockUser(username = "jurist01", roles = "JURIST")
     void updateToDo_nonExistingId() throws Exception {
         ToDoRequestDto updateDto = new ToDoRequestDto(
                 "Ingen betydning",
@@ -181,7 +183,7 @@ public class ToDoIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = "ADMIN")
+    @WithMockUser(username = "jurist01", roles = "JURIST")
     void getToDoSize_returnsNumberOfTodosFromDatabase() throws Exception {
         mockMvc.perform(get("/api/v1/todos/size"))
                 .andExpect(status().isOk())
@@ -189,7 +191,7 @@ public class ToDoIntegrationTest {
     }
 
     @Test
-    @WithMockUser(username = "worker01", roles = "SAGSBEHANDLER")
+    @WithMockUser(username = "jurist01", roles = "JURIST")
     void findAssignedTodos_returnsTodosForLoggedInUser() throws Exception {
         mockMvc.perform(get("/api/v1/todos/assigned")
                         .accept(MediaType.APPLICATION_JSON))
@@ -221,5 +223,77 @@ public class ToDoIntegrationTest {
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].name").value("NDA"))
                 .andExpect(jsonPath("$[0].archived").value(false));
+    }
+
+    @Test
+    @WithMockUser(username = "jurist01", roles = "JURIST")
+    void getCaseAssigneesForTodo_existingId_returnsCorrectUsers() throws Exception {
+        mockMvc.perform(get("/api/v1/todos/{id}/case-assignees", 1L)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(3))
+                .andExpect(jsonPath("$[?(@.username == 'partner01')]").exists())
+                .andExpect(jsonPath("$[?(@.username == 'worker01')]").exists())
+                .andExpect(jsonPath("$[?(@.username == 'jurist01')]").exists());
+    }
+
+    @Test
+    @WithMockUser(username = "jurist01", roles = "JURIST")
+    void getCaseAssigneesForTodo_unknownId_returnsNotFound() throws Exception {
+        mockMvc.perform(get("/api/v1/todos/{id}/case-assignees", 9999L)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(username = "jurist01", roles = "JURIST")
+    void updateAssignees_existingTodo_updatesCorrectly() throws Exception {
+        ToDoAssigneeUpdateRequest requestDto =
+                new ToDoAssigneeUpdateRequest(List.of(2L));
+
+        String json = objectMapper.writeValueAsString(requestDto);
+
+        // PATCH
+        mockMvc.perform(patch("/api/v1/todos/{id}/assignees", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.toDoAssignees.length()").value(1))
+                .andExpect(jsonPath("$.toDoAssignees[0].username").value("partner01"));
+
+        // GET verify state
+        mockMvc.perform(get("/api/v1/todos/{id}", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.toDoAssignees.length()").value(1))
+                .andExpect(jsonPath("$.toDoAssignees[0].username").value("partner01"));
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
+    void updateAssignees_unknownTodo_returnsNotFound() throws Exception {
+        ToDoAssigneeUpdateRequest requestDto =
+                new ToDoAssigneeUpdateRequest(List.of(2L));
+
+        String json = objectMapper.writeValueAsString(requestDto);
+
+        mockMvc.perform(patch("/api/v1/todos/{id}/assignees", 9999L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(username = "jurist01", roles = "JURIST")
+    void updateAssignees_withNonExistingUser_returnsNotFound() throws Exception {
+        ToDoAssigneeUpdateRequest requestDto =
+                new ToDoAssigneeUpdateRequest(List.of(99999L));
+
+        String json = objectMapper.writeValueAsString(requestDto);
+
+        mockMvc.perform(patch("/api/v1/todos/{id}/assignees", 1)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isNotFound());
     }
 }

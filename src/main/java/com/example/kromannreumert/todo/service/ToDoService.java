@@ -110,7 +110,7 @@ public class ToDoService {
     public Set<User> getCaseAssigneesForTodo(Long todoId) {
         ToDo todo = toDoRepository.findById(todoId)
                 .orElseThrow(() -> new ToDoNotFoundException(LogAction.VIEW_ONE_TODO_FAILED,
-                        null,
+                        "",
                         "id" + todoId));
 
         Casee casee = todo.getCaseId();
@@ -130,7 +130,16 @@ public class ToDoService {
                                 "id" + todoId)))
                 .collect(Collectors.toSet());
 
+        int oldSize = todo.getUsers() != null ? todo.getUsers().size() : 0;
+
         todo.setUsers(newAssignees);
+        int newSize = newAssignees.size();
+
+        if (newSize > oldSize) {
+            loggingService.log(LogAction.ADDED_USERS_TO_TODO, name, "Assigned users to: " + todo.getName());
+        } else if (newSize < oldSize) {
+            loggingService.log(LogAction.REMOVED_USERS_TO_TODO, name, "Removed users from: " + todo.getName());
+        }
 
         ToDo saved = toDoRepository.save(todo);
         return toDoMapper.toToDoResponseDto(saved);
@@ -139,7 +148,6 @@ public class ToDoService {
     public ToDoResponseDto createToDo(String name, ToDoRequestNewToDoDto todoRequestDto) {
         try {
             Casee casee = caseRepository.findById(todoRequestDto.caseId())
-                    // Add Casee exception and replace Entity not found here
                     .orElseThrow(() -> new EntityNotFoundException("Case not found"));
             ToDo toDo = toDoMapper.toToDo(todoRequestDto);
             toDo.setCaseId(casee);
@@ -163,6 +171,7 @@ public class ToDoService {
                             "id: " + id));
 
             toDoRepository.delete(toDo);
+
             loggingService.log(LogAction.DELETE_TODO, name, "Deleted todo: " + toDo.getName() + ", id: " + id);
 
         } catch (Exception e) {
@@ -203,16 +212,11 @@ public class ToDoService {
     public List<ToDoResponseDto> findAssignedToUser(String username) {
         try {
             List<ToDo> toDos = toDoRepository.findDistinctByUsers_UsernameAndArchivedFalse(username);
-
-            List<ToDoResponseDto> responseDtos = toDos.stream()
+            return toDos.stream()
                     .map(toDoMapper::toToDoResponseDto)
                     .toList();
-
-            loggingService.log(LogAction.VIEW_ALL_TODOS, username, "Viewed todos assigned to user");
-
-            return responseDtos;
         } catch (Exception e) {
-            throw new ActionFailedException(LogAction.VIEW_ALL_TODOS_FAILED, username, e);
+            throw new RuntimeException("Failed fetching assigned todos", e);
         }
     }
 }

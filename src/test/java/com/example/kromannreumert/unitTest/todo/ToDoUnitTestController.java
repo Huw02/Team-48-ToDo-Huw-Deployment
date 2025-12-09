@@ -1,16 +1,19 @@
 package com.example.kromannreumert.unitTest.todo;
 
+import com.example.kromannreumert.exception.customException.http4xxExceptions.UserNotFoundException;
 import com.example.kromannreumert.exception.customException.http4xxExceptions.toDo.ToDoNotFoundException;
 import com.example.kromannreumert.logging.entity.LogAction;
 import com.example.kromannreumert.logging.service.LoggingService;
 import com.example.kromannreumert.security.config.SecurityConfig;
 import com.example.kromannreumert.todo.controller.ToDoController;
+import com.example.kromannreumert.todo.dto.ToDoAssigneeUpdateRequest;
 import com.example.kromannreumert.todo.dto.ToDoRequestDto;
 import com.example.kromannreumert.todo.dto.ToDoRequestNewToDoDto;
 import com.example.kromannreumert.todo.dto.ToDoResponseDto;
 import com.example.kromannreumert.todo.entity.Priority;
 import com.example.kromannreumert.todo.entity.Status;
 import com.example.kromannreumert.todo.service.ToDoService;
+import com.example.kromannreumert.user.entity.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -342,5 +345,124 @@ public class ToDoUnitTestController {
     void getToDosSizeNotLoggedIn() throws Exception {
         mockMvc.perform(get("/api/v1/todos/size"))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void getCaseAssigneesForTodoNotLoggedIn() throws Exception {
+        mockMvc.perform(get("/api/v1/todos/{id}/case-assignees", 1L))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = "jurist", roles = "JURIST")
+    void getCaseAssigneesForTodoWhileLoggedIn_returnsUsers() throws Exception {
+        Long id = 1L;
+
+        User user1 = User.builder()
+                .userId(1L)
+                .username("worker1")
+                .name("Worker One")
+                .build();
+
+        User user2 = User.builder()
+                .userId(2L)
+                .username("worker2")
+                .name("Worker Two")
+                .build();
+
+        when(toDoService.getCaseAssigneesForTodo(id))
+                .thenReturn(Set.of(user1, user2));
+
+        mockMvc.perform(get("/api/v1/todos/{id}/case-assignees", id)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2));
+
+        verify(toDoService).getCaseAssigneesForTodo(id);
+    }
+
+    @Test
+    @WithMockUser(username = "jurist", roles = "JURIST")
+    void getCaseAssigneesForTodo_ServiceThrows_returnsNotFound() throws Exception {
+        Long id = 999L;
+
+        when(toDoService.getCaseAssigneesForTodo(id))
+                .thenThrow(new ToDoNotFoundException(LogAction.VIEW_ONE_TODO_FAILED, "jurist", "Todo Not Found"));
+
+        mockMvc.perform(get("/api/v1/todos/{id}/case-assignees", id))
+                .andExpect(status().isNotFound());
+
+        verify(toDoService).getCaseAssigneesForTodo(id);
+    }
+
+    @Test
+    void updateAssigneesNotLoggedIn() throws Exception {
+        mockMvc.perform(patch("/api/v1/todos/{id}/assignees", 1L))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @WithMockUser(username = "jurist", roles = "JURIST")
+    void updateAssigneesWhileLoggedIn_returnsUpdatedTodo() throws Exception {
+        Long id = 1L;
+
+        ToDoAssigneeUpdateRequest requestDto = new ToDoAssigneeUpdateRequest(
+                List.of(1L, 2L)
+        );
+
+        ToDoResponseDto responseDto = new ToDoResponseDto(
+                1L,
+                "NDA",
+                "Opdaterede assignees",
+                LocalDateTime.now(),
+                LocalDate.of(2025, 12, 1),
+                LocalDate.of(2025, 12, 2),
+                Set.of(),
+                Priority.HIGH,
+                Status.IN_PROGRESS,
+                false
+        );
+
+        when(toDoService.updateAssignees(eq(id), any(ToDoAssigneeUpdateRequest.class), eq("jurist")))
+                .thenReturn(responseDto);
+
+        String jsonRequest = objectMapper.writeValueAsString(requestDto);
+
+        mockMvc.perform(patch("/api/v1/todos/{id}/assignees", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRequest))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.name").value("NDA"))
+                .andExpect(jsonPath("$.description").value("Opdaterede assignees"))
+                .andExpect(jsonPath("$.priority").value("HIGH"))
+                .andExpect(jsonPath("$.status").value("IN_PROGRESS"))
+                .andExpect(jsonPath("$.archived").value(false));
+
+        verify(toDoService).updateAssignees(eq(id), any(ToDoAssigneeUpdateRequest.class), eq("jurist"));
+    }
+
+    @Test
+    @WithMockUser(username = "jurist", roles = "JURIST")
+    void updateAssignees_ServiceThrows_returnsBadRequest() throws Exception {
+        Long id = 1L;
+
+        ToDoAssigneeUpdateRequest requestDto = new ToDoAssigneeUpdateRequest(
+                List.of(1L, 2L)
+        );
+
+        doThrow(new UserNotFoundException(LogAction.VIEW_ONE_USER_FAILED,
+                "jurist",
+                "id" + id))
+                .when(toDoService).updateAssignees(eq(id), any(ToDoAssigneeUpdateRequest.class), eq("jurist"));
+
+        String jsonRequest = objectMapper.writeValueAsString(requestDto);
+
+        mockMvc.perform(patch("/api/v1/todos/{id}/assignees", id)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRequest))
+                .andExpect(status().isNotFound());
+
+        verify(toDoService).updateAssignees(eq(id), any(ToDoAssigneeUpdateRequest.class), eq("jurist"));
     }
 }
