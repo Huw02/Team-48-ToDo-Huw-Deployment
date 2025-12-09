@@ -110,7 +110,7 @@ public class ToDoService {
     public Set<User> getCaseAssigneesForTodo(Long todoId) {
         ToDo todo = toDoRepository.findById(todoId)
                 .orElseThrow(() -> new ToDoNotFoundException(LogAction.VIEW_ONE_TODO_FAILED,
-                        null,
+                        "",
                         "id" + todoId));
 
         Casee casee = todo.getCaseId();
@@ -215,11 +215,8 @@ public class ToDoService {
             return toDos.stream()
                     .map(toDoMapper::toToDoResponseDto)
                     .toList();
-
-
-
         } catch (Exception e) {
-            throw new ActionFailedException(LogAction.VIEW_ALL_TODOS_FAILED, username, e);
+            throw new RuntimeException("Failed fetching assigned todos", e);
         }
     }
 }

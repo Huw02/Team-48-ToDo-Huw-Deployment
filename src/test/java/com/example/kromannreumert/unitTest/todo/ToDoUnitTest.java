@@ -2,6 +2,7 @@ package com.example.kromannreumert.unitTest.todo;
 
 import com.example.kromannreumert.casee.entity.Casee;
 import com.example.kromannreumert.casee.repository.CaseRepository;
+import com.example.kromannreumert.exception.customException.http4xxExceptions.toDo.ToDoNotFoundException;
 import com.example.kromannreumert.logging.entity.LogAction;
 import com.example.kromannreumert.logging.service.LoggingService;
 import com.example.kromannreumert.todo.dto.ToDoAssigneeUpdateRequest;
@@ -521,7 +522,7 @@ public class ToDoUnitTest {
 
         when(toDoRepository.findById(todoId)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class,
+        assertThrows(ToDoNotFoundException.class,
                 () -> toDoService.getCaseAssigneesForTodo(todoId));
 
         verify(toDoRepository).findById(todoId);

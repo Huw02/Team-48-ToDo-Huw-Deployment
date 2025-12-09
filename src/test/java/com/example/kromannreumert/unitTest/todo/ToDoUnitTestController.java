@@ -1,5 +1,6 @@
 package com.example.kromannreumert.unitTest.todo;
 
+import com.example.kromannreumert.exception.customException.http4xxExceptions.UserNotFoundException;
 import com.example.kromannreumert.exception.customException.http4xxExceptions.toDo.ToDoNotFoundException;
 import com.example.kromannreumert.logging.entity.LogAction;
 import com.example.kromannreumert.logging.service.LoggingService;
@@ -386,7 +387,7 @@ public class ToDoUnitTestController {
         Long id = 999L;
 
         when(toDoService.getCaseAssigneesForTodo(id))
-                .thenThrow(new RuntimeException("Todo not found"));
+                .thenThrow(new ToDoNotFoundException(LogAction.VIEW_ONE_TODO_FAILED, "jurist", "Todo Not Found"));
 
         mockMvc.perform(get("/api/v1/todos/{id}/case-assignees", id))
                 .andExpect(status().isNotFound());
@@ -450,7 +451,9 @@ public class ToDoUnitTestController {
                 List.of(1L, 2L)
         );
 
-        doThrow(new RuntimeException("Failed updating assignees"))
+        doThrow(new UserNotFoundException(LogAction.VIEW_ONE_USER_FAILED,
+                "jurist",
+                "id" + id))
                 .when(toDoService).updateAssignees(eq(id), any(ToDoAssigneeUpdateRequest.class), eq("jurist"));
 
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
@@ -458,7 +461,7 @@ public class ToDoUnitTestController {
         mockMvc.perform(patch("/api/v1/todos/{id}/assignees", id)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
 
         verify(toDoService).updateAssignees(eq(id), any(ToDoAssigneeUpdateRequest.class), eq("jurist"));
     }

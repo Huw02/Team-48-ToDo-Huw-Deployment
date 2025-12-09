@@ -1,5 +1,6 @@
 package com.example.kromannreumert.integrationTest.todo;
 
+import com.example.kromannreumert.exception.customException.http4xxExceptions.UserNotFoundException;
 import com.example.kromannreumert.todo.dto.ToDoAssigneeUpdateRequest;
 import com.example.kromannreumert.todo.dto.ToDoRequestDto;
 import com.example.kromannreumert.todo.dto.ToDoRequestNewToDoDto;
@@ -279,7 +280,7 @@ public class ToDoIntegrationTest {
         mockMvc.perform(patch("/api/v1/todos/{id}/assignees", 9999L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -290,9 +291,9 @@ public class ToDoIntegrationTest {
 
         String json = objectMapper.writeValueAsString(requestDto);
 
-        mockMvc.perform(patch("/api/v1/todos/{id}/assignees", 1L)
+        mockMvc.perform(patch("/api/v1/todos/{id}/assignees", 1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isNotFound());
     }
 }
