@@ -219,4 +219,10 @@ public class ToDoService {
             throw new RuntimeException("Failed fetching assigned todos", e);
         }
     }
+
+    public List<ToDoResponseDto> findByAssigneeSearch(String q) {
+        return toDoRepository.findByAssigneeSearch(q).stream()
+                .map(toDoMapper::toToDoResponseDto)
+                .toList();
+    }
 }
