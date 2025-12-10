@@ -4,7 +4,7 @@ import com.example.kromannreumert.casee.dto.CaseDeleteRequestDTO;
 import com.example.kromannreumert.casee.dto.CaseRequestDTO;
 import com.example.kromannreumert.casee.dto.CaseResponseDTO;
 import com.example.kromannreumert.casee.dto.CaseUpdateRequest;
-import com.example.kromannreumert.casee.service.CaseeService;
+import com.example.kromannreumert.casee.service.CaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,32 +18,37 @@ import java.security.Principal;
 public class CaseController {
 
     @Autowired
-    CaseeService caseeService;
+    CaseService caseService;
 
     @PostMapping("")
     public ResponseEntity<?> createCase(@RequestBody CaseRequestDTO request, Principal principal) {
-        CaseResponseDTO response = caseeService.createCase(request, principal);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        try {
+            CaseResponseDTO response = caseService.createCase(request, principal);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>("Failed to create case: " + request.name(), HttpStatus.BAD_REQUEST);
+        }
     }
 
 
     @GetMapping("")
     public ResponseEntity<?> getCases(Principal principal) {
-        return new ResponseEntity<>(caseeService.getAllCases(principal), HttpStatus.OK);
+        return new ResponseEntity<>(caseService.getAllCases(principal), HttpStatus.OK);
     }
 
     @PutMapping("")
     public ResponseEntity<?> updateCase(@RequestBody CaseUpdateRequest request, Principal principal) {
-        return new ResponseEntity<>(caseeService.updateCase(request, principal), HttpStatus.OK);
+        return new ResponseEntity<>(caseService.updateCase(request, principal), HttpStatus.OK);
     }
 
     @DeleteMapping("")
     public ResponseEntity<?> deleteCase(@RequestBody CaseDeleteRequestDTO request, Principal principal) {
-        return ResponseEntity.ok(caseeService.deleteCase(request, principal));
+        return ResponseEntity.ok(caseService.deleteCase(request, principal));
     }
 
 
     }
+
 
 
 

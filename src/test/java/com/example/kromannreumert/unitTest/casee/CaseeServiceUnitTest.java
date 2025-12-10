@@ -7,7 +7,7 @@ import com.example.kromannreumert.casee.dto.CaseUpdateRequest;
 import com.example.kromannreumert.casee.entity.Casee;
 import com.example.kromannreumert.casee.mapper.CaseMapper;
 import com.example.kromannreumert.casee.repository.CaseRepository;
-import com.example.kromannreumert.casee.service.CaseeService;
+import com.example.kromannreumert.casee.service.CaseService;
 import com.example.kromannreumert.client.entity.Client;
 import com.example.kromannreumert.client.repository.ClientRepository;
 import com.example.kromannreumert.exception.customException.http4xxExceptions.casee.CaseNotFoundException;
@@ -35,7 +35,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 public class CaseeServiceUnitTest {
 
     @InjectMocks
-    CaseeService caseeService;
+    CaseService caseeService;
 
     @Mock
     CaseRepository caseRepository;
@@ -122,7 +122,7 @@ public class CaseeServiceUnitTest {
     // --------- createCase ---------
     @Test
     void createCase_createsAndLogs() {
-        CaseRequestDTO dto = new CaseRequestDTO("New Case", 1L, Set.of(2L), 100L, 2);
+        CaseRequestDTO dto = new CaseRequestDTO("New Case", 1L, Set.of(2), 100L, "testAdmin");
 
         User responsible = new User();
         responsible.setUserId(2L);
@@ -134,6 +134,8 @@ public class CaseeServiceUnitTest {
         when(clientRepository.findById(1L)).thenReturn(Optional.of(client));
         when(userRepository.findById(2)).thenReturn(Optional.of(assignee));
         when(userRepository.findById(2)).thenReturn(Optional.of(responsible));
+        when(userRepository.findByUsername("testAdmin")).thenReturn(Optional.of(responsible));
+
 
         CaseResponseDTO response = caseeService.createCase(dto, principal);
 
@@ -145,20 +147,24 @@ public class CaseeServiceUnitTest {
     // --------- updateCase ---------
     @Test
     void updateCase_updatesAndLogs() {
-        CaseUpdateRequest dto = new CaseUpdateRequest(1L, "Updated Case", 200L, 2, Set.of(2));
+        CaseUpdateRequest dto = new CaseUpdateRequest(1L, "Updated Case", 200L, "testPartner", Set.of(2));
 
         Casee existing = new Casee();
         existing.setId(1L);
         existing.setUsers(new HashSet<>());
 
         User responsible = new User();
-        responsible.setUserId(2L);
+        responsible.setUsername("testPartner");
 
         User assignee = new User();
         assignee.setUserId(2L);
+        assignee.setUsername("ossas");
+        assignee.setName("bent");
 
         when(caseRepository.findById(1L)).thenReturn(Optional.of(existing));
-        when(userRepository.findById(2)).thenReturn(Optional.of(responsible));
+        when(userRepository.findByUsername("testPartner")).thenReturn(Optional.of(responsible));
+        when(userRepository.findById(2)).thenReturn(Optional.of(assignee));
+
 
         // Mock save() to return the same instance
         when(caseRepository.save(existing)).thenReturn(existing);

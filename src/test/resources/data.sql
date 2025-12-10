@@ -24,9 +24,9 @@ INSERT INTO client (name, idprefix)
 VALUES ('Kromann Reumert', 1000),
        ('AlphaSolution', 2000);
 
-INSERT INTO casee (name, client_id, id_prefix)
-VALUES ('Contract Review', 1, 1100),
-       ('System Rollout', 2, 2200);
+INSERT INTO casee (name, client_id, id_prefix, responsible_user_user_id, created)
+VALUES ('Contract Review', 1, 1100, 1, '2025-12-09'),
+       ('System Rollout', 2, 2200, 1, '2025-12-09' );
 
 INSERT INTO to_do ( name, description, case_id, created, start_date, end_date, archived, priority, status) VALUES
         ('NDA', 'Draft NDA', 1,'2024-01-15 10:00:00', '2024-02-01', '2024-02-05', FALSE, 'HIGH', 'NOT_STARTED'),

@@ -4,6 +4,7 @@ import com.example.kromannreumert.casee.dto.CaseDeleteRequestDTO;
 import com.example.kromannreumert.casee.dto.CaseRequestDTO;
 import com.example.kromannreumert.casee.dto.CaseUpdateRequest;
 import com.example.kromannreumert.client.repository.ClientRepository;
+import com.example.kromannreumert.logging.entity.Logging;
 import com.example.kromannreumert.logging.service.LoggingService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
@@ -47,10 +48,10 @@ public class CaseIntegrationTest {
     @Autowired
     private ClientRepository clientRepository;
 
-    @Test
-    void contextLoads() {
-        assertNotNull(context);
-    }
+    @Autowired
+    private LoggingService loggingService;
+
+
 
     // GET cases
     @Test
@@ -80,9 +81,9 @@ public class CaseIntegrationTest {
         var dto = new CaseRequestDTO(
                 "Enterprise-Case",
                 1L,
-                Set.of(2L),
+                Set.of(2),
                 3300L,
-                2 // responsibleUserId
+                "admin" // responsibleUserId
         );
 
         mockMvc.perform(post(BASEURL)
@@ -92,7 +93,7 @@ public class CaseIntegrationTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value(dto.name()))
                 .andExpect(jsonPath("$.idPrefix").value(dto.idPrefix()))
-                .andExpect(jsonPath("$.responsibleUser.userId").value(dto.responsibleUserId()))
+                .andExpect(jsonPath("$.responsibleUser.username").value(dto.responsibleUsername()))
                 .andExpect(jsonPath("$.users[0].userId").value(2));
     }
 
@@ -101,9 +102,9 @@ public class CaseIntegrationTest {
         var dto = new CaseRequestDTO(
                 "Partner-Created-Case",
                 1L,
-                Set.of(2L),
+                Set.of(2),
                 4400L,
-                2
+                "partner01"
         );
 
         mockMvc.perform(post(BASEURL)
@@ -113,7 +114,7 @@ public class CaseIntegrationTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value(dto.name()))
                 .andExpect(jsonPath("$.idPrefix").value(dto.idPrefix()))
-                .andExpect(jsonPath("$.responsibleUser.userId").value(dto.responsibleUserId()))
+                .andExpect(jsonPath("$.responsibleUser.username").value(dto.responsibleUsername()))
                 .andExpect(jsonPath("$.users[0].userId").value(2));
     }
 
@@ -122,9 +123,9 @@ public class CaseIntegrationTest {
         var dto = new CaseRequestDTO(
                 "Sagsbehandler-Created-Case",
                 1L,
-                Set.of(3L),
+                Set.of(3),
                 5500L,
-                3
+                "worker01"
         );
 
         mockMvc.perform(post(BASEURL)
@@ -134,7 +135,7 @@ public class CaseIntegrationTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value(dto.name()))
                 .andExpect(jsonPath("$.idPrefix").value(dto.idPrefix()))
-                .andExpect(jsonPath("$.responsibleUser.userId").value(dto.responsibleUserId()))
+                .andExpect(jsonPath("$.responsibleUser.username").value(dto.responsibleUsername()))
                 .andExpect(jsonPath("$.users[0].userId").value(3));
     }
 
@@ -143,9 +144,9 @@ public class CaseIntegrationTest {
         var dto = new CaseRequestDTO(
                 "Jurist-Created-Case",
                 1L,
-                Set.of(4L),
+                Set.of(4),
                 6600L,
-                4
+                "testJurist"
         );
 
         mockMvc.perform(post(BASEURL)
@@ -162,7 +163,7 @@ public class CaseIntegrationTest {
                 1L,
                 "Updated-Enterprise-Case",
                 3310L,
-                2,
+                "admin",
                 Set.of(2, 3)
         );
 
@@ -173,7 +174,7 @@ public class CaseIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(dto.name()))
                 .andExpect(jsonPath("$.idPrefix").value(dto.idPrefix()))
-                .andExpect(jsonPath("$.responsibleUser.userId").value(dto.responsibleUserId()))
+                .andExpect(jsonPath("$.responsibleUser.username").value(dto.responsibleUsername()))
                 .andExpect(jsonPath("$.users.length()").value(dto.assigneeIds().size()));
     }
 
@@ -183,7 +184,7 @@ public class CaseIntegrationTest {
                 2L,
                 "Updated-Partner-Case",
                 4410L,
-                2,
+                "partner01",
                 Set.of(2)
         );
 
@@ -194,7 +195,7 @@ public class CaseIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(dto.name()))
                 .andExpect(jsonPath("$.idPrefix").value(dto.idPrefix()))
-                .andExpect(jsonPath("$.responsibleUser.userId").value(dto.responsibleUserId()))
+                .andExpect(jsonPath("$.responsibleUser.username").value(dto.responsibleUsername()))
                 .andExpect(jsonPath("$.users[0].userId").value(2));
     }
 
@@ -204,7 +205,7 @@ public class CaseIntegrationTest {
                 1L,
                 "Updated-Sagsbehandler-Case",
                 5510L,
-                3,
+                "worker01",
                 Set.of(3)
         );
 
@@ -215,7 +216,7 @@ public class CaseIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(dto.name()))
                 .andExpect(jsonPath("$.idPrefix").value(dto.idPrefix()))
-                .andExpect(jsonPath("$.responsibleUser.userId").value(dto.responsibleUserId()))
+                .andExpect(jsonPath("$.responsibleUser.username").value(dto.responsibleUsername()))
                 .andExpect(jsonPath("$.users[0].userId").value(3));
     }
 
@@ -225,7 +226,7 @@ public class CaseIntegrationTest {
                 1L,
                 "Jurist-Update-Attempt",
                 6601L,
-                4,
+                "jurist01",
                 Set.of(4)
         );
 

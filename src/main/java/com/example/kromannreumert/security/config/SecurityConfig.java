@@ -33,6 +33,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**", "/status/healthz", "/h2-console/**").permitAll()
 
+                        .requestMatchers(HttpMethod.GET, "/api/v1/user/jurists")
+                        .hasAnyRole("ADMIN", "PARTNER", "SAGSBEHANDLER", "JURIST")
+
                         // GET endpoints
                         .requestMatchers(HttpMethod.GET, "/api/v1/cases/**").hasAnyRole("ADMIN", "PARTNER", "SAGSBEHANDLER", "JURIST")
                         .requestMatchers(HttpMethod.GET, "/api/v1/client/**").hasAnyRole("ADMIN", "PARTNER", "SAGSBEHANDLER")

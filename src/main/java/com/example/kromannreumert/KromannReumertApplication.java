@@ -98,7 +98,8 @@ public class KromannReumertApplication {
                     client1,
                     onlySagsbehandler,
                     10455L,
-                    testPartner
+                    testPartner,
+                    LocalDateTime.now()
             ));
 
             Casee case2 = caseRepository.save(new Casee(
@@ -106,7 +107,8 @@ public class KromannReumertApplication {
                     client2,
                     onlySagsbehandler,
                     10696L,
-                    testPartner
+                    testPartner,
+                    LocalDateTime.now()
             ));
 
             // Case med både sagsbehandler OG jurist
@@ -115,7 +117,8 @@ public class KromannReumertApplication {
                     client3,
                     sagsOgJurist,
                     10777L,
-                    testPartner
+                    testPartner,
+                    LocalDateTime.now()
             ));
 
             // TODOS under caseMedJurist
