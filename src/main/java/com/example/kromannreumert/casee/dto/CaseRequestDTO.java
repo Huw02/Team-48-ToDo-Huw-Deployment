@@ -8,7 +8,7 @@ import java.util.Set;
 public record CaseRequestDTO(
         String name,
         Long clientId,
-        Set<Long> userIds,
+        Set<Integer> assigneeIds,
         Long idPrefix,
-        Integer responsibleUserId
+        String responsibleUsername
 ) {}

@@ -9,6 +9,10 @@ import com.example.kromannreumert.casee.mapper.CaseMapper;
 import com.example.kromannreumert.casee.repository.CaseRepository;
 import com.example.kromannreumert.client.entity.Client;
 import com.example.kromannreumert.client.repository.ClientRepository;
+import com.example.kromannreumert.exception.customException.http4xxExceptions.ApiBusinessException;
+import com.example.kromannreumert.exception.customException.http4xxExceptions.UserNotFoundException;
+import com.example.kromannreumert.exception.customException.http4xxExceptions.casee.CaseNotFoundException;
+import com.example.kromannreumert.exception.customException.http5xxException.ActionFailedException;
 import com.example.kromannreumert.logging.entity.LogAction;
 import com.example.kromannreumert.logging.service.LoggingService;
 import com.example.kromannreumert.user.entity.User;
@@ -68,13 +72,17 @@ public class CaseService {
         Client client = clientRepository.findById(request.clientId())
                 .orElseThrow(() -> new RuntimeException("Client not found: " + request.clientId()));
 
-        Set<User> users = request.userIds().stream()
+        Set<User> users = request.assigneeIds().stream()
                 .map(id -> userRepository.findById(Math.toIntExact(id))
                         .orElseThrow(() -> new RuntimeException("User not found: " + id)))
                 .collect(Collectors.toSet());
 
-        User responsibleUser = userRepository.findById(request.responsibleUserId())
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        User responsibleUser = userRepository.findByUsername(request.responsibleUsername())
+                .orElseThrow(() -> new UserNotFoundException(
+                        LogAction.VIEW_ONE_USER_FAILED,
+                        principal.getName(),
+                        "username=" + request.responsibleUsername()
+                ));
 
         Casee newCase = new Casee(
                 request.name(),
@@ -110,11 +118,11 @@ public class CaseService {
                 .orElseThrow(() -> new EntityNotFoundException("Case not found"));
 
         User responsible = userRepository.findByUsername(request.responsibleUsername())
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(LogAction.VIEW_ONE_USER_FAILED, principal.getName(), request.responsibleUsername()));
 
         Set<User> assignees = request.assigneeIds().stream()
                 .map(id -> userRepository.findById(id)
-                        .orElseThrow(() -> new EntityNotFoundException("User not found")))
+                        .orElseThrow(() -> new UserNotFoundException(LogAction.VIEW_ONE_USER_FAILED, principal.getName(), id.toString())))
                 .collect(Collectors.toSet());
 
         loggingService.log(LogAction.CASE_UPDATE, principal.getName(), " Updated case: " + target.getName() + "\nID: " + target.getIdPrefix() + "\nAssignees: " + target.getUsers() + "\nTo\n" + request.name() + "\nID: " + request.idPrefix() + "\nAssignees: " + assignees);
@@ -132,14 +140,23 @@ public class CaseService {
 
 
     public String deleteCase(CaseDeleteRequestDTO request, Principal principal) {
-        Casee target = caseRepository.findById(request.id())
-                .orElseThrow(() -> new EntityNotFoundException("Case not found"));
+        try {
+            Casee target = caseRepository.findById(request.id())
+                    .orElseThrow(() -> new CaseNotFoundException(
+                            LogAction.CASE_DELETE,
+                            principal.getName(),
+                            "id=" + request.id()
+                    ));
 
-        loggingService.log(LogAction.CASE_DELETE, principal.getName(), " Deleted case: " + target.getName() + "\nID: " + target.getIdPrefix() + "\nAssignees: " + target.getUsers());
-        caseRepository.delete(target);
+            loggingService.log(LogAction.CASE_DELETE, principal.getName(), " Deleted case: " + target.getName() + "\nID: " + target.getIdPrefix() + "\nAssignees: " + target.getUsers());
+            caseRepository.delete(target);
 
-        return "Case deleted successfully";
+            return "Case deleted successfully";
 
 
+        } catch (Exception e) {
+            if (e instanceof ApiBusinessException) throw e;
+            throw new ActionFailedException(LogAction.CASE_DELETE, principal.getName(), e);
+        }
     }
 }

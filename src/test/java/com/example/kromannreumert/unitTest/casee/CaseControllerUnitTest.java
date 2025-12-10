@@ -3,7 +3,7 @@ package com.example.kromannreumert.unitTest.casee;
 import com.example.kromannreumert.casee.controller.CaseController;
 import com.example.kromannreumert.casee.dto.*;
 import com.example.kromannreumert.casee.entity.Casee;
-import com.example.kromannreumert.casee.service.CaseeService;
+import com.example.kromannreumert.casee.service.CaseService;
 import com.example.kromannreumert.logging.service.LoggingService;
 import com.example.kromannreumert.security.config.SecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,7 +35,7 @@ public class CaseControllerUnitTest {
     MockMvc mockMvc;
 
     @MockitoBean
-    CaseeService caseeService;
+    CaseService caseeService;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -93,7 +93,7 @@ public class CaseControllerUnitTest {
     @Test
     @WithMockUser(roles = {"ADMIN", "PARTNER", "SAGSBEHANDLER"})
     void should_createCase_isCreated_forAuthorizedRoles() throws Exception {
-        CaseRequestDTO request = new CaseRequestDTO("New Case", 100L, Set.of(1L, 2L), 1000L, 1);
+        CaseRequestDTO request = new CaseRequestDTO("New Case", 100L, Set.of(1, 2), 1000L, "testAdmin");
         CaseResponseDTO response = new CaseResponseDTO("New Case", null, Collections.emptySet(), 1000L, null);
 
         when(caseeService.createCase(eq(request), any(Principal.class))).thenReturn(response);
@@ -110,7 +110,7 @@ public class CaseControllerUnitTest {
     @Test
     @WithMockUser(roles = "JURIST")
     void should_createCase_isForbidden_forJurist() throws Exception {
-        CaseRequestDTO request = new CaseRequestDTO("New Case", 100L, Set.of(1L, 2L), 1000L, 1);
+        CaseRequestDTO request = new CaseRequestDTO("New Case", 100L, Set.of(1, 2), 1000L, "testAdmin");
 
         mockMvc.perform(post(BASE)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -122,7 +122,7 @@ public class CaseControllerUnitTest {
 
     @Test
     void should_createCase_isUnauthorized_forNoUser() throws Exception {
-        CaseRequestDTO request = new CaseRequestDTO("New Case", 100L, Set.of(1L, 2L), 1000L, 1);
+        CaseRequestDTO request = new CaseRequestDTO("New Case", 100L, Set.of(1, 2), 1000L, "testAdmin");
 
         mockMvc.perform(post(BASE)
                         .contentType(MediaType.APPLICATION_JSON)

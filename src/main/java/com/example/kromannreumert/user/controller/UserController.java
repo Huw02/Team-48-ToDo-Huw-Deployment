@@ -6,6 +6,7 @@ import com.example.kromannreumert.user.dto.UserResponseDTO;
 import com.example.kromannreumert.user.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -27,6 +28,13 @@ public class UserController {
     public ResponseEntity<List<UserResponseDTO>>getAllUsers(Principal principal){
         return ResponseEntity.ok(userService.getAllUsers(principal.getName()));
     }
+
+    @GetMapping("/jurists")
+    public ResponseEntity<List<UserResponseDTO>>getAllJurists(Principal principal){
+        return ResponseEntity.ok(userService.getAllJurists(principal));
+    }
+
+
 
     @GetMapping("/{userId}")
     public ResponseEntity<UserResponseDTO>getUserById(@PathVariable int userId, Principal principal){

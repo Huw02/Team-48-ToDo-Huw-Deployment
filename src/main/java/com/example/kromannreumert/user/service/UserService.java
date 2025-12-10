@@ -14,6 +14,7 @@ import com.example.kromannreumert.user.repository.RoleRepository;
 import com.example.kromannreumert.user.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,6 +22,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -119,6 +121,24 @@ public class UserService implements UserDetailsService {
             loggingService.log(LogAction.VIEW_ALL_USERS_FAILED, name, "Failed to view all users");
             if (e instanceof ApiBusinessException) throw e;
             throw new ActionFailedException(LogAction.VIEW_ALL_USERS_FAILED, name, e);
+        }
+    }
+
+
+    public List<UserResponseDTO> getAllJurists(Principal principal) {
+        try {
+            List<User> users = userRepository.findByRoles_RoleName("JURIST");
+
+            List<UserResponseDTO> dtoList = users.stream()
+                    .map(userMapper::toUserResponseDTO)
+                    .toList();
+
+            loggingService.log(LogAction.JURISTS_VIEW, principal.getName(), "Viewed all jurists, the user found: " + dtoList.size() + " users in the system");
+            return dtoList;
+        } catch(RuntimeException e){
+            loggingService.log(LogAction.JURISTS_VIEW_FAILED, principal.getName(), "Failed to view all jurists");
+            if (e instanceof ApiBusinessException) throw e;
+            throw new ActionFailedException(LogAction.JURISTS_VIEW_FAILED, principal.getName(), e);
         }
     }
 
