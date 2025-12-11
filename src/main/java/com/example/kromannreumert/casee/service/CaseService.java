@@ -66,6 +66,13 @@ public class CaseService {
         return caseRepository.findAllByName(caseName).orElseThrow(() -> new RuntimeException("Case not found"));
     }
 
+    public Set<User> getAssigneesFromCase(Long id, Principal principal) {
+        Casee casee = caseRepository.findById(id)
+                .orElseThrow(() -> new CaseNotFoundException(LogAction.CASE_READ_FAILED, principal.getName(), "Case not found"));
+
+        return casee.getUsers();
+    }
+
 
     public CaseResponseDTO createCase(CaseRequestDTO request, Principal principal) {
 

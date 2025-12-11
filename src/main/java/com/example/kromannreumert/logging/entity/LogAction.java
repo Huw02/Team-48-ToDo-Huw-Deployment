@@ -47,6 +47,7 @@ public enum LogAction {
     UPDATE_TODO_FAILED,
     CASE_CREATE,
     CASE_READ,
+    CASE_READ_FAILED,
     CASE_UPDATE,
     CASE_DELETE,
     VIEW_ALL_CLIENTS,

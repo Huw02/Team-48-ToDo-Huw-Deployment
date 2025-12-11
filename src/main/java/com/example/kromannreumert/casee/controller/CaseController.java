@@ -36,6 +36,11 @@ public class CaseController {
         return new ResponseEntity<>(caseService.getAllCases(principal), HttpStatus.OK);
     }
 
+    @GetMapping("/{id}/assignees")
+    public ResponseEntity<?> getAssigneesFromCase(@PathVariable Long id, Principal principal) {
+        return new ResponseEntity<>(caseService.getAssigneesFromCase(id, principal), HttpStatus.OK);
+    }
+
     @PutMapping("")
     public ResponseEntity<?> updateCase(@RequestBody CaseUpdateRequest request, Principal principal) {
         return new ResponseEntity<>(caseService.updateCase(request, principal), HttpStatus.OK);
