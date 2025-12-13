@@ -11,8 +11,8 @@ on:
 env:
   REGISTRY: ghcr.io
   # Skift dette til jeres faktiske GitHub organization/username og repo navn
-  IMAGE_NAME_BACKEND: ${{ github.repository }}-backend
-  IMAGE_NAME_FRONTEND: ${{ github.repository }}-frontend
+  IMAGE_NAME_BACKEND: ${{ github.repository_owner }}/team-48-todo-huw-deployment-backend
+  IMAGE_NAME_FRONTEND: ${{ github.repository_owner }}/team-48-todo-huw-deployment-frontend
 
 jobs:
   build-and-push:
