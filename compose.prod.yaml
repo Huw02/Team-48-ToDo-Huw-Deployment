@@ -27,7 +27,7 @@ services:
 
   # Spring Boot Backend - Henter fra GHCR (krav: image: ghcr.io/...)
   backend:
-    image: ghcr.io/huw02/team-48-todo-backend:latest
+    image: ghcr.io/huw02/team-48-todo-deployment-backend:latest
     container_name: todo-backend-prod
     restart: always
     environment:
@@ -52,7 +52,7 @@ services:
 
   # Frontend - Henter fra GHCR
   frontend:
-    image: ghcr.io/huw02/team-48-todo-frontend:latest
+    image: ghcr.io/huw02/team-48-todo-deployment-frontend:latest
     container_name: todo-frontend-prod
     restart: always
     ports:
