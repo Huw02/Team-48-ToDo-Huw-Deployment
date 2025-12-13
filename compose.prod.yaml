@@ -31,11 +31,9 @@ services:
     container_name: todo-backend-prod
     restart: always
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-tododb}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
-      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SERVER_PORT: 8080
+      DB_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-tododb}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      DB_USERNAME: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "127.0.0.1:8080:8080"  # Kun tilgængelig via localhost (nginx proxy)
     depends_on:
@@ -44,7 +42,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/status/healthz"]
       interval: 30s
       timeout: 10s
       retries: 3
