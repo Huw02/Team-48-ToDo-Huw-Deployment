@@ -106,6 +106,7 @@ jobs:
                 DB_URL: jdbc:mysql://mysql:3306/tododb?useSSL=false&allowPublicKeyRetrieval=true
                 DB_USERNAME: testuser
                 DB_PASSWORD: testpass
+                SPRING_PROFILES_ACTIVE: test
               ports:
                 - "8080:8080"
           EOF
