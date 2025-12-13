@@ -76,41 +76,123 @@ jobs:
       # Krav: Integrationstest med "docker compose up -d"
       - name: Run Integration Test
         run: |
-          # Tag images til compose file
-          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:latest backend:test
-          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:latest frontend:test
-          
+          # Tag images for testing
+          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:latest backend-test:latest
+          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:latest frontend-test:latest
+
+          # Create test compose file with improved healthchecks
+          cat > docker-compose.test.yml <<EOF
+          services:
+            mysql:
+              image: mysql:8.0
+              environment:
+                MYSQL_ROOT_PASSWORD: testpass
+                MYSQL_DATABASE: tododb
+                MYSQL_USER: testuser
+                MYSQL_PASSWORD: testpass
+              healthcheck:
+                test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ptestpass"]
+                interval: 10s
+                timeout: 10s
+                retries: 20
+                start_period: 30s
+
+            backend:
+              image: backend-test:latest
+              depends_on:
+                mysql:
+                  condition: service_healthy
+              environment:
+                SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/tododb?useSSL=false&allowPublicKeyRetrieval=true
+                SPRING_DATASOURCE_USERNAME: testuser
+                SPRING_DATASOURCE_PASSWORD: testpass
+                SPRING_JPA_HIBERNATE_DDL_AUTO: create
+              ports:
+                - "8080:8080"
+              healthcheck:
+                test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/status/healthz"]
+                interval: 10s
+                timeout: 10s
+                retries: 20
+                start_period: 60s
+
+            frontend:
+              image: frontend-test:latest
+              depends_on:
+                backend:
+                  condition: service_healthy
+              ports:
+                - "80:80"
+          EOF
+
           # Start services
-          docker compose up -d
-          
-          # Vent på at services er klar (krav: vente lidt)
-          echo "Waiting for services to be ready..."
-          sleep 30
-          
-          # Check backend health endpoint
+          echo "Starting services..."
+          docker compose -f docker-compose.test.yml up -d
+
+          # Wait and monitor MySQL
+          echo "Waiting for MySQL to be healthy..."
+          for i in {1..30}; do
+            MYSQL_STATUS=$(docker compose -f docker-compose.test.yml ps mysql --format json | jq -r '.[0].Health')
+            echo "Attempt $i/30: MySQL health status: $MYSQL_STATUS"
+            if [ "$MYSQL_STATUS" = "healthy" ]; then
+              echo "✅ MySQL is healthy!"
+              break
+            fi
+            sleep 5
+          done
+
+          if [ "$MYSQL_STATUS" != "healthy" ]; then
+            echo "❌ MySQL failed to become healthy"
+            docker compose -f docker-compose.test.yml logs mysql
+            docker compose -f docker-compose.test.yml down -v
+            exit 1
+          fi
+
+          # Wait and monitor Backend
+          echo "Waiting for backend to be healthy..."
+          for i in {1..30}; do
+            BACKEND_STATUS=$(docker compose -f docker-compose.test.yml ps backend --format json | jq -r '.[0].Health')
+            echo "Attempt $i/30: Backend health status: $BACKEND_STATUS"
+            if [ "$BACKEND_STATUS" = "healthy" ]; then
+              echo "✅ Backend is healthy!"
+              break
+            fi
+            sleep 5
+          done
+
+          if [ "$BACKEND_STATUS" != "healthy" ]; then
+            echo "❌ Backend failed to become healthy"
+            docker compose -f docker-compose.test.yml logs backend
+            docker compose -f docker-compose.test.yml down -v
+            exit 1
+          fi
+
+          # Test backend endpoint (krav: kontakt et udvalgt endpoint)
           echo "Testing backend health endpoint..."
-          BACKEND_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/status/healthz)
-          
-          if [ "$BACKEND_STATUS" != "200" ]; then
-            echo "Backend health check failed with status: $BACKEND_STATUS"
-            docker compose logs
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/status/healthz)
+
+          if [ "$RESPONSE" != "200" ]; then
+            echo "❌ Backend returned $RESPONSE"
+            docker compose -f docker-compose.test.yml logs
+            docker compose -f docker-compose.test.yml down -v
             exit 1
           fi
-          
-          # Krav: Kontakt et udvalgt endpoint (her: frontend på /)
-          echo "Testing frontend endpoint..."
-          FRONTEND_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:80/)
-          
-          if [ "$FRONTEND_STATUS" != "200" ]; then
-            echo "Frontend check failed with status: $FRONTEND_STATUS"
-            docker compose logs
+
+          # Test frontend (krav: kontakt frontend på /)
+          echo "Testing frontend..."
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost/)
+
+          if [ "$RESPONSE" != "200" ]; then
+            echo "❌ Frontend returned $RESPONSE"
+            docker compose -f docker-compose.test.yml logs
+            docker compose -f docker-compose.test.yml down -v
             exit 1
           fi
-          
-          echo "✅ Integration tests passed!"
-          
+
+          echo "✅ All integration tests passed!"
+
           # Krav: Stop og slet containere efter test
-          docker compose down -v
+          docker compose -f docker-compose.test.yml down -v
 
       # Krav: Skubbe det taggede image til GHCR (kun hvis tests passed)
       - name: Push Backend to GHCR
