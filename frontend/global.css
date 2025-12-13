@@ -1,0 +1,130 @@
+/* Regular */
+@font-face {
+    font-family: 'Berling';
+    src: url('../fonts/Berling/BerlingLTStd-Roman.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+
+
+/* Bold */
+@font-face {
+    font-family: 'Berling';
+    src: url('../fonts/Berling/BerlingLTStd-Bold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+
+/* Light */
+@font-face {
+    font-family: 'Europa';
+    src: url('../fonts/EuropaCollection_OTFs/EuropaLight.otf') format('opentype');
+    font-weight: 300;
+    font-style: normal;
+}
+
+
+/* Regular */
+@font-face {
+    font-family: 'Europa';
+    src: url('../fonts/EuropaCollection_OTFs/EuropaRegular.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+
+
+/* Bold */
+@font-face {
+    font-family: 'Europa';
+    src: url('../fonts/EuropaCollection_OTFs/EuropaBold.otf') format('opentype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+:root {
+  --primary-color: #003C46;
+  --background-primary: #FFFFFF;
+  --background-secondary: #EEEEEE;
+}
+
+body {
+    font-family: 'Europa', sans-serif;
+    color: var(--primary-color);
+}
+
+h1 {
+    font-family: 'BerlingLTStd', serif;
+    font-weight: 400;
+    text-align: center;
+    font-size: 3em;
+    padding-top: 1em;
+}
+
+h2 {
+    font-family: 'Europa', sans-serif;
+    font-weight: 400;
+    font-size: 24px;
+}
+
+h3 {
+    font-family: 'Europa', sans-serif;
+    font-weight: 300;
+    font-size: 24px;
+}
+
+th {
+    font-family: 'Europa', sans-serif;
+    font-weight: 400;
+    font-size: 24px;
+
+}
+tbody {
+    font-family: 'Europa', sans-serif;
+    font-weight: 300;
+    font-size: 24px;
+}
+
+
+button {
+    color: white;
+    background-color: var(--primary-color);
+    border: none;
+    padding: .75em 2em;
+    cursor: pointer;
+    font-family: 'Europa';
+    font-weight: 300;
+    font-size: .6em;
+    transition: .4s;
+    
+}
+
+button:hover {
+    color: var(--primary-color);
+    background-color: var(--background-secondary);
+
+}
+
+
+ button.inverted {
+    color: var(--primary-color);
+    background-color: var(--background-secondary);
+    border: none;
+    padding: .75em 2em;
+    cursor: pointer;
+    font-family: 'Europa';
+    font-weight: 300;
+    font-size: 1em;
+    transition: .4s;
+    
+}
+
+button.inverted:hover {
+    color: var(--background-secondary);
+    background-color: var(--primary-color);
+    outline: .1em solid var(--background-secondary);
+
+
+}

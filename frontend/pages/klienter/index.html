@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Klienter</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/global.css">
+</head>
+
+<body>
+
+<header>
+   <nav id="navbar"></nav>
+</header>
+
+<section class="klient_wrapper">
+    <h1>Klienter</h1>
+
+    <!-- <div class="search_container">
+        <input type="text" placeholder="Søg..." class="search_input">
+    </div> -->
+
+    <div class="topItems">
+            <input type="text" placeholder="Søg..." class="search_input">
+            <button id="createButton">Opret Klient</button>
+
+        </div>
+
+    <div>
+
+
+    <div class="tableContainer">
+        <table class="client_table">
+        <tr>
+            <th>Nummer</th>
+            <th>Navn</th>
+            <th>Ansvarlig</th>
+            <th>Handlinger</th>
+        </tr>
+    </table>
+    </div>
+    
+</section>
+
+<div class="modal_overlay hidden">
+    <div class="client_modal">
+        <h2>Klientnavn</h2>
+        <input type="text" class="modal_input modal_name_input" placeholder="Klient navn">
+        <!---- Afventer da jeg ikke ved om det relevant at have id update med 
+        <h3>ID:</h3>
+        <input type="text" class="modal_input" placeholder="Klient nummer">
+        <p class="modal_sub"></p>
+        ---->
+        <br>
+        <h2>Klient ansvarlig</h2>
+        <p class="current_user_label"></p>
+        <input type="text" class="modal_input modal_user_input" placeholder="Bruger navn">
+        <br>
+        <button class="update_client_btn"> Opdater klient </button>
+    </div>
+</div>
+
+<div class="create_modal_overlay hidden">
+    <div class="create_client_modal">
+        <h2>Opret klient</h2>
+
+        <label>Klientnavn</label>
+        <input type="text" class="create_name_input">
+
+        <label>Bruger</label>
+        <input type="text" class="create_user_input">
+
+        <label>ID Prefix</label>
+        <input type="number" class="create_idprefix_input">
+
+        <button class="create_submit_btn">Opret</button>
+    </div>
+</div>
+
+<script src="client.js"></script>
+<script src="/components/navbar/navbar.js"></script>
+</body>
+</html>

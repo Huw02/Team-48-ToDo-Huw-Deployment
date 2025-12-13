@@ -1,0 +1,45 @@
+* {
+    margin: 0;
+    box-sizing: border-box;
+}
+
+nav {
+    height: 100px;
+    width: 100%;
+    background-color: #003C46;
+    display: flex;
+    color: white;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2em;
+    transition: ease 0.3s;
+}
+
+nav h3 {
+    transition: color 0.3s ease;
+}
+
+nav h3:hover {
+    color: #d8d8d8;
+    cursor: pointer;
+}
+
+.logo {
+    height: 30px;
+}
+
+
+
+.items {
+    display: flex;
+    gap: 2em;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);    
+}
+
+.items a {
+    text-decoration: none;
+    color: white;
+    cursor: pointer;
+}

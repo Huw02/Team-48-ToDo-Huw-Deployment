@@ -1,0 +1,184 @@
+:root {
+    --primary-color: #003C46;
+    --light-bg: #F7F7F7;
+    --btn-blue: #003C46;
+    --btn-red: #7A1F1F;
+    --font-dark: #0F2A2E;
+}
+
+body {
+    background-color: white;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 90%;
+    margin: 40px auto;
+}
+
+.title {
+    text-align: center;
+    font-size: 42px;
+    color: var(--primary-color);
+}
+
+.search-container {
+    width: 100%;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.search-input {
+    padding: 10px;
+    width: 260px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.tabs {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.tab {
+    margin: 0 15px;
+    cursor: pointer;
+    font-size: 18px;
+    color: var(--font-dark);
+}
+
+.tab.active {
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+.create-btn-wrapper {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+
+
+.todo-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--light-bg);
+}
+
+.todo-table th {
+    background-color: white;
+    color: var(--primary-color);
+    padding: 12px;
+    text-align: left;
+}
+
+.todo-table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+}
+
+.todo-table tr {
+    font-size: 14px;
+    color: var(--primary-color);
+}
+
+.todo-table tr:hover {
+    background-color: #e2e2e2;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    padding: 30px 32px;
+    border-radius: 0;
+    width: 430px;
+    max-width: 90%;
+    box-shadow: none;
+    text-align: center;
+}
+
+.modal h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #ffffff;
+    font-size: 26px;
+}
+
+.form-group {
+    margin-bottom: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 14px;
+    align-items: center;
+}
+
+.form-group label {
+    color: #ffffff;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    max-width: 320px;
+    padding: 10px 12px;
+    background-color: #E5E5E5;
+    border-radius: 0;
+    border: none;
+    font-size: 14px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.form-group textarea {
+    resize: none;
+    min-height: 80px;
+}
+
+.archive-checkbox-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.archive-checkbox-wrapper input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--primary-color);
+    cursor: pointer;
+}
+
+.modal-actions {
+    margin-top: 18px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+
+
+
+.todo-delete-cell {
+    text-align: center;
+    width: 60px;
+}

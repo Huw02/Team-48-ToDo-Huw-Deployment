@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brugeradministration</title>
+    <link rel="stylesheet" href="user.css">
+</head>
+<body>
+    <nav id="navbar"></nav>
+
+    <main>
+
+        <div class="filterBar">
+            <span>Filter:</span>
+
+            <select class="filterRoles">
+                <option>Alle roller</option>
+                <option>ADMIN</option>
+                <option>PARTNER</option>
+                <option>SAGSBEHANDLER</option>
+                <option>JURIST</option>
+            </select>
+
+            <select class="filterCreated">
+                <option>Sorter efter dato</option>
+                <option>Nyeste først</option>
+                <option>Ældste først</option>
+            </select>
+
+            <input type="text" class="searchUser" placeholder="Søg efter bruger..."> 
+
+            <button class="createUserBtn">Opret bruger</button>
+
+        </div>
+
+        
+
+        <div class="contentWrapper">
+            <div class="usersContainer">
+
+                <div class="usersTableHeader">
+                    <h5>Navn</h5>
+                    <h5>Email</h5>
+                    <h5>Rolle</h5>
+                    <h5>Oprettet</h5>
+                    <h5>Handling</h5>
+                </div>
+
+                <div class="usersListContainer">
+        
+                </div>
+
+                <span class="usersCounter"></span>
+            </div>
+
+            <div class="userFormContainer" id="createUserPanel">
+                <div class="formHeader">
+                    <h3>Opret ny bruger</h3>
+                </div>
+
+                <div class="formContent">
+                    <div class="formGroup">
+                        <label>Brugernavn</label>
+                        <input type="text" id="create_username" placeholder="f.eks. AnNi0001">
+                    </div>
+
+                    <div class="formGroup">
+                        <label>Fulde navn</label>
+                        <input type="text" id="create_name" placeholder="f.eks. Anders Nielsen"> 
+                    </div>
+
+                    <div class="formGroup">
+                        <label>Email</label>
+                        <input type="email" id="create_email" placeholder="f.eks. Anders.Nielsen@kromannreumert.dk">
+                    </div>
+                    
+                    <div class="formGroup">
+                        <label>Adgangskode</label>
+                        <input type="password" id="create_password" placeholder="Min. 8 tegn er anbefalet">
+                    </div>
+
+                    <div class="formGroup">
+                         <select id="create_role">
+                            <option value="">Vælg rolle</option>
+                            <option value=1>Admin</option>
+                            <option value=2>Partner</option>
+                            <option value=3>Sagsbehandler</option>
+                            <option value=4>Jurist</option>
+                        </select>
+                        
+                    </div>
+
+                    <div class="formButtons">
+                        <button class="createButton" id="createUserSubmitBtn">Opret bruger</button>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="userFormContainer hidden" id="updateUserPanel">
+                <div class="formHeader">
+                    <h3>Opdater bruger</h3>
+                </div>
+
+                <div class="formContent">
+                    <div class="formGroup">
+                        <label>Brugernavn</label>
+                        <input type="text" id="update_username" placeholder="f.eks. AnNi0001">
+                    </div>
+
+                    <div class="formGroup">
+                        <label>Fulde navn</label>
+                        <input type="text" id="update_name" placeholder="f.eks. Anders Nielsen">
+                    </div>
+
+                    <div class="formGroup">
+                        <label>Email</label>
+                        <input type="email" id="update_email" placeholder="f.eks. Anders.Nielsen@kromannreumert.dk">
+                    </div>
+
+
+                    <div class="formGroup">
+                        <label>Adgangskode</label>
+                        <input type="password" id="update_password" placeholder="Lad stå tom for at beholde nuværende" >
+                    </div>
+
+
+
+                    <div class="formGroup">
+                        <label>Rolle</label>
+                        <select id="update_role">
+                            <option value="">Vælg rolle</option>
+                            <option value=1>Admin</option>
+                            <option value=2>Partner</option>
+                            <option value=3>Sagsbehandler</option>
+                            <option value=4>Jurist</option>
+                        </select>
+                    </div>
+
+
+                    <div class="formButtons">
+                         <button class="btnSecondary" id="cancelUpdateBtn">Annuller</button>
+                        <button class="btnPrimary" id="updateUserSubmitBtn">Opdater bruger</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="/components/modules/modulejson.js"></script>
+    <script type="module" src="user.js"></script>
+    <script src="/components/navbar/navbar.js"></script>
+</body>
+
+</html>

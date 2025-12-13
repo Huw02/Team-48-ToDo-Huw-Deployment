@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/global.css">
+    <link rel="stylesheet" href="/pages/sager/sager.css">
+    
+</head>
+<body>
+    <nav id="navbar"></nav>
+
+    <h1>Sager</h1>
+        <div class="topItems">
+            <input type="text" placeholder="Søg...">
+            <button id="createButton">Opret Sag</button>
+
+        </div>
+
+
+    <div class="tableContainer">
+        <table>
+            <thead>
+                <tr>
+                    <th>Nummer</th>
+                    <th>Navn</th>
+                    <th>Dato</th>
+                    <th>Handlinger</th>
+                </tr>
+            </thead>
+
+            <tbody class="tableBody">
+                <tr>
+                    <td>Sagsnummer</td>
+                    <td>Sagsnavn</td>
+                    <td>Oprettet osv</td>
+                    <td class="actions">
+                        <button class="edit-btn">Rediger</button>
+                        <button class="delete-btn">Slet</button>
+                    </td>
+                </tr>
+
+
+            </tbody>
+        </table>
+
+
+        <!-- <div class="editFrameBackground">
+            <div class="editFrame">
+                <form action="/api/sager" method="PUT">
+
+                    <label for="name">Sagsnavn</label>
+                    <input type="text" id="name" name="name" placeholder="Sagsnavn">
+
+                    <label for="responsibleUserId">Sagsansvarlig</label>
+                    <input type="text" id="caseOwner" name="caseOwner" placeholder="navn på creator">
+
+
+                </form>
+            </div>
+        </div> -->
+    </div>
+
+
+
+
+    <script src="/components/navbar/navbar.js"></script>
+    <script type="module" src="./sager.js" defer></script>
+
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <title>Opgaver</title>
+    <link rel="stylesheet" href="/global.css">
+    <link rel="stylesheet" href="allTodos.css">
+</head>
+<body>
+<nav id="navbar"></nav>
+<div class="container">
+
+    <h1 class="title">Opgaver</h1>
+
+    <div class="search-container">
+        <form id="searchForm">
+            <input type="text" placeholder="Søg bruger (navn, brugernavn, mail)..." 
+               class="search-input" name="q">
+        </form>
+    </div>
+
+    <div class="tabs">
+        <span id="allTasksTab" class="tab active">Alle Opgaver</span>
+        <span id="myTasksTab" class="tab">Mine Opgaver</span>
+    </div>
+
+    <div class="create-btn-wrapper">
+        <button class="create-btn">Opret Opgave</button>
+    </div>
+
+    <div class="modal-overlay hidden" id="createTodoModal">
+        <div class="modal">
+            <h2>Opret ny opgave</h2>
+            <form id="createTodoForm">
+                <div class="form-group">
+                    <label for="todoName">Navn</label>
+                    <input type="text" id="todoName" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="todoDescription">Beskrivelse</label>
+                    <textarea id="todoDescription" rows="3"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="todoCase">Sag</label>
+                    <select id="todoCase" required>
+                        <option value="">Vælg sag</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="todoStartDate">Startdato</label>
+                    <input type="date" id="todoStartDate">
+                </div>
+
+                <div class="form-group">
+                    <label for="todoEndDate">Slutdato</label>
+                    <input type="date" id="todoEndDate">
+                </div>
+
+                <div class="form-group">
+                    <label for="todoPriority">Prioritet</label>
+                    <select id="todoPriority" required>
+                        <option value="">Vælg prioritet</option>
+                        <option value="LOW">Lav</option>
+                        <option value="MEDIUM">Mellem</option>
+                        <option value="HIGH">Høj</option>
+                    </select>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" id="cancelCreateTodo" class="inverted">Annuller</button>
+                    <button type="submit" class="primary inverted">Opret</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <table class="todo-table">
+        <thead>
+        <tr>
+            <th data-sort="id">ID</th>
+            <th data-sort="name">Navn</th>
+            <th data-sort="created">Oprettet</th>
+            <th>Beskrivelse</th>
+            <th data-sort="startDate">Start Dato</th>
+            <th data-sort="endDate">Slut Dato</th>
+            <th data-sort="status">Status</th>
+            <th data-sort="priority">Prioritet</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody id="todoTableBody">
+        </tbody>
+    </table>
+
+</div>
+    <script src="/components/navbar/navbar.js"></script>
+    <script src="allTodo.js" defer type="module"></script>
+
+</body>
+</html>

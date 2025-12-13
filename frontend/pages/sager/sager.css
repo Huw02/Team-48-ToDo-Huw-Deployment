@@ -1,0 +1,136 @@
+:root {
+  --primary-color: #003C46;
+  --background-primary: #FFFFFF;
+  --background-secondary: #EEEEEE;
+}
+
+.topItems {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1em;
+    padding-top: 1em;
+}
+.topItems button {
+    font-size: 1em;
+}
+.topItems input {
+    background-color: var(--background-secondary);
+    color: var(--primary-color);
+    border: none;
+    font-family: 'Europa';
+    font-weight: 300;
+    font-size: 1em;
+    outline: none;
+    box-shadow: none;
+    border: none;
+    text-align: center;
+    padding: .5em 2em;
+}
+
+table {
+    border-collapse: separate;
+    border-spacing: 4em 1em;
+    font-weight: 300;
+    
+
+}
+
+.tableContainer {
+    padding-top: 3em;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+
+
+
+table th, 
+table td {
+    text-align: left;
+}
+
+.editFrameBackground {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: calc(100vh - 200px);
+    background: #ffffff25;
+    backdrop-filter: blur(2px);
+
+    transform: translate(-50%, -50%);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.editFrame {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary-color);
+    padding: 6em;
+    
+}
+
+.editFrame form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1em;
+}
+
+.editFrame form label {
+    color: white;
+    font-size: 1.5em;
+}
+
+.editFrame form input {
+    background-color: var(--background-secondary);
+    color: var(--primary-color);
+    border: none;
+    font-family: 'Europa';
+    font-weight: 300;
+    font-size: 1em;
+    outline: none;
+    box-shadow: none;
+    border: none;
+    text-align: center;
+    padding: .5em 2em;
+}
+
+.editFrame form textarea {
+    font-family: 'Europa';
+    font-weight: 300;
+    font-size: 1em;
+    outline: none;
+    box-shadow: none;
+    border: none;
+    background-color: var(--background-secondary);
+    color: var(--primary-color);
+    text-align: center;
+
+    width: 400px;
+    height: 150px;
+}
+
+form button {
+    font-size: 1em;
+}
+
+
+select {
+    background-color: var(--background-secondary);
+    color: var(--primary-color);
+    font-size: 1em;
+    padding: .5em 2em;
+    outline: none;
+    box-shadow: none;
+    border: none;
+}

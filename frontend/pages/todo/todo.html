@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <title>Opgave</title>
+    <link rel="stylesheet" href="/global.css">
+    <link rel="stylesheet" href="todo.css">
+</head>
+<body>
+<nav id="navbar"></nav>
+
+<div class="todo-detail-container">
+
+    <!-- Titel + nummer -->
+    <h1 id="todoTitle" class="todo-title">Titel på opgave</h1>
+    <p id="todoNumber" class="todo-number">#000000</p>
+    <button id="editTodoBtn" class="edit-btn">Rediger</button>
+
+    <!-- 2x2 info grid -->
+    <section class="todo-meta-grid">
+        <div class="meta-item">
+            <p class="meta-label">Oprettet</p>
+            <p id="todoCreated" class="meta-value">Ikke oprettet</p>
+        </div>
+
+        <div class="meta-item">
+            <p class="meta-label">Status</p>
+            <p id="todoStatus" class="meta-value">Ikke startet</p>
+        </div>
+
+        <div class="meta-item">
+            <p class="meta-label">Start Dato</p>
+            <p id="todoStartDate" class="meta-value">Ingen start dato</p>
+        </div>
+
+        <div class="meta-item">
+            <p class="meta-label">Slut Dato</p>
+            <p id="todoEndDate" class="meta-value">Ingen slut dato</p>
+        </div>
+    </section>
+
+    <!-- Medarbejdere -->
+    <section class="todo-employees">
+        <div class="employees-header">
+            <span class="employees-title">Medarbejdere</span>
+            <div>
+                <button class="employees-add-btn">Administrer</button>
+            </div>
+        </div>
+        <ul id="todoEmployees" class="employees-list">
+            
+        </ul>
+    </section>
+
+    <!-- Modal til adminstration af medarbejdere -->
+    <div class="modal-overlay hidden" id="addEmployeeModal">
+        <div class="modal">
+            <h2>Administrer medarbejdere</h2>
+            <form id="addEmployeeForm">
+                <div class="form-group">
+                    <div id="employeeCheckboxList" class="employee-checkbox-list">
+                        
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" id="cancelAddEmployee" class="inverted">Annuller</button>
+                    <button type="submit" class="inverted">Gem</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay hidden" id="editTodoModal">
+    <div class="modal">
+        <h2>Rediger opgave</h2>
+        <form id="editTodoForm">
+            
+            <div class="form-group">
+                <label for="editTodoName">Navn</label>
+                <input type="text" id="editTodoName" required>
+            </div>
+
+            <div class="form-group">
+                <label for="editTodoDescription">Beskrivelse</label>
+                <textarea id="editTodoDescription" rows="3"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="editTodoStartDate">Startdato</label>
+                <input type="date" id="editTodoStartDate">
+            </div>
+
+            <div class="form-group">
+                <label for="editTodoEndDate">Slutdato</label>
+                <input type="date" id="editTodoEndDate">
+            </div>
+
+            <div class="form-group">
+                <label for="editTodoPriority">Prioritet</label>
+                <select id="editTodoPriority">
+                    <option value="LOW">Lav</option>
+                    <option value="MEDIUM">Mellem</option>
+                    <option value="HIGH">Høj</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="editTodoStatus">Status</label>
+                <select id="editTodoStatus">
+                    <option value="NOT_STARTED">Ikke startet</option>
+                    <option value="IN_PROGRESS">I gang</option>
+                    <option value="DONE">Færdig</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Arkiveret</label>
+                <div class="archive-checkbox-wrapper">
+                    <input type="checkbox" id="editArchived">
+                    <span>Marker som arkiveret</span>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" id="cancelEditTodo">Annuller</button>
+                <button type="submit" class="primary">Gem ændringer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+    <hr class="todo-divider">
+
+    <section class="todo-description-section">
+        <h2 class="todo-description-title">Beskrivelse</h2>
+        <div class="todo-description-box">
+            <p id="todoDescriptionText"></p>
+        </div>
+    </section>
+
+</div>
+
+<script src="/components/navbar/navbar.js"></script>
+<script src="todo.js" type="module" defer></script>
+
+</body>
+</html>

@@ -1,0 +1,145 @@
+:root {
+    --primary-color: #003C46;
+    --card-bg: #003C46;
+    --text-light: #ffffff;
+    --font-dark: #0F2A2E;
+}
+
+@font-face {
+    font-family: Europa-Light;
+    src: url(/fonts/EuropaCollection_OTFs/EuropaRegular.otf);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Europa-Light", sans-serif;
+}
+
+.top_nav {
+    background-color: var(--primary-color);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+}
+
+.logo img {
+    width: 150px;
+}
+
+.nav_section a {
+    margin: 0 12px;
+    text-decoration: none;
+    color: white;
+    font-size: 18px;
+}
+
+.logout button {
+    color: white;
+    font-size: 18px;
+    text-decoration: none;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+.nav_section a {
+    margin: 0 15px;
+    text-decoration: none;
+    color: white;
+    font-size: 18px;
+}
+
+.logout button {
+    color: white;
+    font-size: 18px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.dashboard_layout {
+    padding: 60px;
+    display: flex;
+    gap: 40px;
+    align-items: stretch;
+}
+
+.left_column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.activity_container {
+    flex: 1.3;
+}
+
+.stats_container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+}
+
+.stat_card {
+    background-color: var(--card-bg);
+    color: white;
+    padding: 45px;
+    font-size: 28px;
+    text-align: center;
+    border-radius: 4px;
+}
+
+.activity_card {
+    background-color: var(--card-bg);
+    color: white;
+    padding: 40px;
+    border-radius: 4px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.activity_card h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.activity_card ul {
+    list-style: none;
+}
+
+.activity_card li {
+    padding: 10px 0;
+    border-bottom: 1px solid #cfcfcf;
+}
+
+.faq_container {
+    width: 100%;
+}
+
+.faq_card {
+    background-color: var(--card-bg);
+    color: white;
+    padding: 30px;
+    border-radius: 4px;
+    width: 100%;
+}
+
+.faq_title {
+    padding-bottom: 15px;
+    border-bottom: 1px solid #cfcfcf;
+    margin-bottom: 10px;
+}
+
+.faq_card ul {
+    list-style: none;
+}
+
+.faq_card li {
+    padding: 12px 0;
+    border-bottom: 1px solid #cfcfcf;
+}

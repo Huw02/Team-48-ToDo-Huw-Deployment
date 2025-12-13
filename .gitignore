@@ -1,0 +1,33 @@
+# Java/Maven
+backend/target/
+backend/*.jar
+backend/*.war
+backend/.mvn/
+backend/mvnw
+backend/mvnw.cmd
+
+# Frontend (hvis I bruger build tools)
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+
+# IDE
+.idea/
+*.iml
+*.iws
+.vscode/
+
+# Environment
+.env
+.env.prod
+**/.env
+
+# Docker
+**/docker-compose.override.yml
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+
+**/src/main/resources/keys

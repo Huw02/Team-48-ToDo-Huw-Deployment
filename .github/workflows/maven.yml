@@ -1,0 +1,63 @@
+# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Java CI with Maven
+
+on:
+  push:
+    branches: [ "main", "dev", "QA" ]
+  pull_request:
+    branches: [ "main", "dev", "QA" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+    - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955
+    - name: Set up JDK 21
+      uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: maven
+
+   ## - name: Run docker test
+   ##   run: |
+   ##       docker compose up -d
+   ##       sleep 60
+   ##       docker ps -a
+   ##       docker logs $(docker ps -aq --filter name=app)
+   ##       curl -i http://127.0.0.1:8080/healthz
+   ##       docker compose down
+
+    - uses: actions/cache@v4
+      with:
+          path: ~/.m2/repository
+          key: maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: maven-${{ runner.os }}-
+
+
+    - name: Build with Maven (tests + package)
+      ## Changed package to clean verify as it now test and pack the mvn to run
+      run: mvn -B clean verify --file pom.xml
+
+    - name: Add coverage to PR
+      if: github.event_name == 'pull_request'
+      id: jacoco
+      uses: madrapps/jacoco-report@v1.7.2
+      with:
+        paths: |
+          ${{ github.workspace }}/target/site/jacoco/jacoco.xml
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+  

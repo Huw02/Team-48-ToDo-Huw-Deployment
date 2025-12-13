@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logs</title>
+    <link rel="stylesheet" href="logging.css">
+</head>
+<body>
+    <nav id="navbar"></nav>
+
+    <main>
+        <div class="filterLogs">
+            <label>Filter: </label>
+
+            <select class="filterUsers">
+                <option>Alle Brugere</option>
+            </select>
+
+            <select class="filterMethods">
+                <option>Alle Metoder</option>
+            </select>
+
+            <select class="filterDay">
+                <option>Alle</option>
+                <option>I dag</option>
+                <option>I går</option>
+                <option>Sidste uge</option>
+                <option>Sidste 30 dage</option>
+            </select>
+
+            <input type="text" class="searchArea" placeholder="Søg i logs...">
+        </div>
+
+        <div class="contentWrapper">
+            <div class="logContainer">
+                <div class="logBar">
+                    <h5>Tidspunkt</h5>
+                    <h5>Bruger</h5>
+                    <h5>Action</h5>
+                </div>
+
+                <div class="logsListContainer">
+                    
+                </div>
+
+                <span class="logsCounter"></span>
+            </div> 
+
+            <div class="logDetailsContainer">
+                <div class="detailsHeader">
+                    <h3>Log Detaljer</h3>
+                </div>
+
+                <div class="detailsContent"> <!-- OPEN detailsContent HERE -->
+                    <div class="detailsLogIdBox">
+                        <h5>LOG ID</h5>
+                        <div class="detailsLogId"></div>
+                    </div>
+
+                    <div class="detailsTimeContainer">
+                        <h5>TIDSPUNKT</h5>
+                        <div class="detailsTime"></div>
+                    </div>
+
+                    <div class="detailsUserContainer">
+                        <h5>BRUGER</h5>
+                        <div class="detailsUserName"></div>
+                        <div class="detailsUserMail"></div>
+                        <div class="detailsUserId"></div>
+                        <div class="detailsUserRole"></div>
+                    </div>
+
+                    <div class="detailsMethodContainer">
+                        <h5>METODE</h5>
+                        <div class="detailsMethod"></div>
+                    </div>
+
+                    <div class="detailsDescriptionContainer">
+                        <h5>BESKRIVELSE</h5>
+                        <div class="detailsDescription"></div>
+                    </div>
+                </div> <!-- CLOSE detailsContent HERE -->
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="/components/modules/modulejson.js"></script>
+    <script type="module" src="logging.js"></script>
+    <script src="/components/navbar/navbar.js"></script>
+</body>
+</html>
