@@ -1,0 +1,72 @@
+# compose.prod.yaml - Production deployment på cloud VM
+# Krav 5: Bruger 'image:' i stedet for 'build:'
+
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: todo-mysql-prod
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-tododb}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mysql-data-prod:/var/lib/mysql
+    # Ingen port mapping - kun tilgængelig internt (sikkerhed)
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      timeout: 20s
+      retries: 10
+      interval: 10s
+
+  # Spring Boot Backend - Henter fra GHCR (krav: image: ghcr.io/...)
+  backend:
+    image: ghcr.io/ek-team-48/team-48-todo-backend:latest
+    container_name: todo-backend-prod
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-tododb}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SERVER_PORT: 8080
+    ports:
+      - "127.0.0.1:8080:8080"  # Kun tilgængelig via localhost (nginx proxy)
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend - Henter fra GHCR
+  frontend:
+    image: ghcr.io/ek-team-48/team-48-todo-frontend:latest
+    container_name: todo-frontend-prod
+    restart: always
+    ports:
+      - "127.0.0.1:3000:80"  # Kun tilgængelig via localhost (nginx proxy)
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - app-network
+
+volumes:
+  mysql-data-prod:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge

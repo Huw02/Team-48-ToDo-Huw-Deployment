@@ -1,0 +1,140 @@
+# .github/workflows/ghcr.yaml
+# Krav 4: Bygger Docker images, kører integrationstest, og uploader til GHCR
+
+name: Build and Push to GHCR
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  # Skift dette til jeres faktiske GitHub organization/username og repo navn
+  IMAGE_NAME_BACKEND: ${{ github.repository }}-backend
+  IMAGE_NAME_FRONTEND: ${{ github.repository }}-frontend
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
+
+      # Log ind på GHCR (krav: logge ind på GHCR)
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d  # v3.0.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Extract metadata for tagging
+      - name: Extract metadata for Backend
+        id: meta-backend
+        uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81  # v5.5.1
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}
+          tags: |
+            type=raw,value=latest
+            type=sha,prefix={{branch}}-
+
+      - name: Extract metadata for Frontend
+        id: meta-frontend
+        uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81  # v5.5.1
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}
+          tags: |
+            type=raw,value=latest
+            type=sha,prefix={{branch}}-
+
+      # Krav: Bygge og tagge Docker-containeren (backend)
+      - name: Build Backend Docker image
+        uses: docker/build-push-action@4a13e500e55cf31b7a5d59a38ab2040ab0f42f56  # v5.1.0
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: false
+          tags: ${{ steps.meta-backend.outputs.tags }}
+          labels: ${{ steps.meta-backend.outputs.labels }}
+          load: true  # Load til lokal Docker for test
+
+      # Bygge frontend
+      - name: Build Frontend Docker image
+        uses: docker/build-push-action@4a13e500e55cf31b7a5d59a38ab2040ab0f42f56  # v5.1.0
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: false
+          tags: ${{ steps.meta-frontend.outputs.tags }}
+          labels: ${{ steps.meta-frontend.outputs.labels }}
+          load: true
+
+      # Krav: Integrationstest med "docker compose up -d"
+      - name: Run Integration Test
+        run: |
+          # Tag images til compose file
+          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:latest backend:test
+          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:latest frontend:test
+          
+          # Start services
+          docker compose up -d
+          
+          # Vent på at services er klar (krav: vente lidt)
+          echo "Waiting for services to be ready..."
+          sleep 30
+          
+          # Check backend health endpoint
+          echo "Testing backend health endpoint..."
+          BACKEND_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/status/healthz)
+          
+          if [ "$BACKEND_STATUS" != "200" ]; then
+            echo "Backend health check failed with status: $BACKEND_STATUS"
+            docker compose logs
+            exit 1
+          fi
+          
+          # Krav: Kontakt et udvalgt endpoint (her: frontend på /)
+          echo "Testing frontend endpoint..."
+          FRONTEND_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:80/)
+          
+          if [ "$FRONTEND_STATUS" != "200" ]; then
+            echo "Frontend check failed with status: $FRONTEND_STATUS"
+            docker compose logs
+            exit 1
+          fi
+          
+          echo "✅ Integration tests passed!"
+          
+          # Krav: Stop og slet containere efter test
+          docker compose down -v
+
+      # Krav: Skubbe det taggede image til GHCR (kun hvis tests passed)
+      - name: Push Backend to GHCR
+        uses: docker/build-push-action@4a13e500e55cf31b7a5d59a38ab2040ab0f42f56  # v5.1.0
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: true
+          tags: ${{ steps.meta-backend.outputs.tags }}
+          labels: ${{ steps.meta-backend.outputs.labels }}
+
+      - name: Push Frontend to GHCR
+        uses: docker/build-push-action@4a13e500e55cf31b7a5d59a38ab2040ab0f42f56  # v5.1.0
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: ${{ steps.meta-frontend.outputs.tags }}
+          labels: ${{ steps.meta-frontend.outputs.labels }}
+
+      - name: Summary
+        run: |
+          echo "### 🚀 Docker Images Published" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Backend:** \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BACKEND }}:latest\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Frontend:** \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:latest\`" >> $GITHUB_STEP_SUMMARY
