@@ -1,6 +1,6 @@
 import {postObjectAsJson, fetchAnyUrl} from "/components/modules/modulejson.js";
 
-const apiBase = "http://localhost:8080/api/v1";
+const apiBase = "/api/v1";
 
 let firstLog, firstLogElement, logsListContainer;
 let allLogs = []; // Store all logs for filtering/sorting

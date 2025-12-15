@@ -1,6 +1,6 @@
 import {postObjectAsJson, fetchAnyUrl} from "/components/modules/modulejson.js";
 
-const apiBase = "http://localhost:8080/api/v1/user";
+const apiBase = "/api/v1/user";
 
 let usersListContainer, createUserPanel, updateUserPanel;
 let selectedUserId = null;

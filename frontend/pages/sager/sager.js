@@ -148,7 +148,7 @@ function buildTable(tableBody) {
 
 function checkAuth() {
     if (!getToken()) {
-        window.location.href = "/pages/login/login.html";
+        window.location.href = "/pages/login/index.html";
     }
 }
 

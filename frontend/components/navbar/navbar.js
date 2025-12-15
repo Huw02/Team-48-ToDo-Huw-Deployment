@@ -43,7 +43,7 @@ function attachLogoutHandler() {
 
     logoutButton.addEventListener('click', () => {
         localStorage.removeItem("token");
-        window.location.href = "/pages/login/login.html"; // optional redirect
+        window.location.href = "/pages/login/index.html"; // optional redirect
     });
 }
 

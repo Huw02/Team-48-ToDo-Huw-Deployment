@@ -30,4 +30,3 @@ frontend/build/
 Thumbs.db
 *.log
 
-**/src/main/resources/keys

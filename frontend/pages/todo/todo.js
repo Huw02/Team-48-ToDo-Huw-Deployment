@@ -46,7 +46,7 @@ function getToken() {
 document.addEventListener("DOMContentLoaded", async () => {
     const token = getToken();
     if (!token) {
-        window.location.href = "/pages/login/login.html";
+        window.location.href = "/pages/login/index.html";
         return;
     }
 
@@ -178,7 +178,7 @@ addEmployeeForm?.addEventListener("submit", async (e) => {
         const res = await postObjectAsJson(`${API_BASE_URL}/todos/${currentTodo.id}/assignees`, { userIds: selectedIds }, "PATCH", true, false)
 
         if (res.status === 401) {
-            window.location.href = "/pages/login/login.html";
+            window.location.href = "/pages/login/index.html";
             return;
         }
 

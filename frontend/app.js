@@ -29,7 +29,7 @@ form?.addEventListener("submit", async (event) => {
         localStorage.setItem("role", role); */
 
         
-        location.replace("http://127.0.0.1:5500/pages/dashboard/index.html") // <---- not optimal just for test
+        location.replace("/pages/dashboard/index.html") // <---- not optimal just for test
     } catch (err) {
         console.error(err);
     }

@@ -10,7 +10,7 @@ async function fetchAnyUrl(url, useToken = false) {
     }
 
     try {
-        const response = await fetch(realURL() + url, { headers });
+        const response = await fetch(url, { headers });
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
@@ -45,7 +45,7 @@ async function postObjectAsJson(url, object, HttpVerbum, useToken = false, basic
     }
 
     try {
-        const response = await fetch(realURL() + url, {
+        const response = await fetch(url, {
             method: HttpVerbum,
             headers,
             body: JSON.stringify(object)

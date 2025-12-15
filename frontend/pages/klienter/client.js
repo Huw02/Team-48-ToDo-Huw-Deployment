@@ -11,7 +11,7 @@ const createName = document.querySelector(".create_name_input");
 const createUser = document.querySelector(".create_user_input");
 const createIdPrefix = document.querySelector(".create_idprefix_input");
 const createSubmit = document.querySelector(".create_submit_btn");
-const APIBASEURL = "http://localhost:8080/api/v1/client/";
+const APIBASEURL = "/api/v1/client/";
 
 let currentButton = null;
 let currentOldName = null;

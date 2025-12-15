@@ -145,7 +145,7 @@ async function removeTodo(todoId) {
         const res = await postObjectAsJson(`${API_BASE_URL}/todos/${todoId}`, {}, "DELETE", true, false);
 
         if (res.status === 401) {
-            window.location.href = "/pages/login/login.html";
+            window.location.href = "/pages/login/index.html";
             return;
         }
 
@@ -279,7 +279,7 @@ createTodoForm.addEventListener("submit", async (e) => {
 
 function checkAuth() {
     if (!getToken()) {
-        window.location.href = "/pages/login/login.html";
+        window.location.href = "/pages/login/index.html";
     }
 }
 window.addEventListener('load', checkAuth);
