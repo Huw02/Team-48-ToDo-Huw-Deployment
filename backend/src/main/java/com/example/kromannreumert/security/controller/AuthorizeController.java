@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("api/v1/auth")
 @CrossOrigin(origins = "*")
 // ADD @EnableMethodSecurity
 public class AuthorizeController {
