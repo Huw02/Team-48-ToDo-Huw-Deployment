@@ -9,7 +9,7 @@ form?.addEventListener("submit", async (event) => {
     const creds = Object.fromEntries(new FormData(form));
 
     try {
-        const res = await fetch("http://localhost:8080/auth/login", {
+        const res = await fetch("/api/v1/auth/login", {
             method: "POST",
             headers: {
                 "Content-type": "application/json"
