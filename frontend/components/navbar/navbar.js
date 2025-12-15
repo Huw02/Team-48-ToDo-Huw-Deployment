@@ -11,7 +11,7 @@ async function loadNavbar() {
 
     let role = [];
     try {
-        const res = await fetch("http://127.0.0.1:8080/auth/me", {
+        const res = await fetch("/api/v1/auth/me", {
             headers: {
                 "Authorization": "Bearer " + token
             }
